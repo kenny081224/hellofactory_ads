@@ -45,6 +45,11 @@ COLUMN_ALIASES = {
     "avg_cpc":       ["평균 cpc", "avg. cpc", "avg cpc"],
     "conv_rate":     ["전환율", "conv. rate"],
     "cost_per_conv": ["전환당비용", "전환당 비용", "cost / conv.", "cost per conv."],
+    "asset":         ["애셋", "asset", "에셋"],
+    "asset_type":    ["애셋 유형", "애셋유형", "asset type", "에셋 유형"],
+    "field_type":    ["필드 유형", "필드유형", "field type"],
+    "performance":   ["실적", "애셋 실적", "performance", "performance label",
+                      "asset performance"],
     "impr_share":    ["검색 노출 점유율", "검색노출점유율", "search impr. share"],
     "lost_is_rank":  ["검색 손실 노출 점유율(순위)", "search lost is (rank)"],
     "lost_is_budget":["검색 손실 노출 점유율(예산)", "search lost is (budget)"],
@@ -246,7 +251,7 @@ def md_table(headers: list[str], rows: list[list[str]], align_right=None) -> str
 
 # -------------------------------------------------- 리포트 종류 자동 판별
 
-REPORT_KINDS = ("search_term", "keyword", "ad", "ad_group", "campaign")
+REPORT_KINDS = ("search_term", "keyword", "asset", "ad", "ad_group", "campaign")
 
 # 파일명으로 판별할 때 쓰는 단어 (구체적인 것부터 검사)
 FILENAME_PATTERNS = {
@@ -254,6 +259,7 @@ FILENAME_PATTERNS = {
     "ad_group":    ["adgroup", "ad_group", "ad-group", "광고그룹"],
     "campaign":    ["campaign", "캠페인"],
     "keyword":     ["keyword", "키워드"],
+    "asset":       ["애셋", "asset", "에셋", "확장", "extension"],
     "ad":          ["광고실적", "rsa", "responsive", "ads_", "_ads"],
 }
 
@@ -288,6 +294,8 @@ def kind_from_columns(path: str) -> str | None:
             return "search_term"
         if "keyword" in cols:
             return "keyword"
+        if "asset" in cols or "asset_type" in cols:
+            return "asset"
         if "ad_id" in cols:
             return "ad"
         if "ad_group" in cols:
@@ -305,6 +313,7 @@ def classify_report(path: str) -> str | None:
 
 # 종류별 한국어 파일명 접두사 (fetch_ads.py 가 만드는 이름과 동일)
 KIND_PREFIX = {
+    "asset": "애셋",
     "campaign": "캠페인",
     "ad_group": "광고그룹",
     "keyword": "키워드",

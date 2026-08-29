@@ -7,6 +7,8 @@
 python3 scripts/analyze.py --dir data/sample --out /tmp
 ```
 
+포함된 예시: 캠페인 / 키워드 / 검색어 / 애셋(RSA 등급) / 애셋(확장) 리포트.
+
 실제 분석은 `data/raw/` 에 진짜 리포트를 넣고 아래를 실행하세요.
 
 ```bash

@@ -30,6 +30,11 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 HEADLINE_MAX = 15      # 전각 언어(한국어) 기준
 DESCRIPTION_MAX = 45
 PATH_MAX = 7
+SITELINK_TEXT_MAX = 12
+SITELINK_DESC_MAX = 17
+CALLOUT_MAX = 12
+SNIPPET_VALUE_MAX = 12
+SNIPPET_MIN_VALUES = 4
 RSA_MIN_HEADLINES = 8  # Google 권장: 최소 8개 이상, 가능하면 15개
 
 
@@ -40,6 +45,45 @@ class PlanError(Exception):
 def load_yaml(path: str) -> dict:
     with open(path, encoding="utf-8") as fh:
         return yaml.safe_load(fh)
+
+
+def validate_assets(assets: dict, plan: dict) -> list[str]:
+    """애셋 글자 수와 캠페인 참조를 검사."""
+    errs = []
+    if not assets:
+        return errs
+    camp_ids = {c["id"] for c in plan["campaigns"]}
+    for group, ids in (assets.get("groups") or {}).items():
+        for cid in ids:
+            if cid not in camp_ids:
+                errs.append(f"[애셋 groups.{group}] 캠페인 id '{cid}' 가 "
+                            f"plan.yaml 에 없습니다.")
+
+    for group, items in (assets.get("sitelinks") or {}).items():
+        for it in items:
+            for key, lim in (("text", SITELINK_TEXT_MAX),
+                             ("desc1", SITELINK_DESC_MAX),
+                             ("desc2", SITELINK_DESC_MAX)):
+                val = it.get(key, "")
+                if len(val) > lim:
+                    errs.append(f"[사이트링크 {group}] {key} '{val}' "
+                                f"{len(val)}자 — 최대 {lim}자")
+    for group, items in (assets.get("callouts") or {}).items():
+        for c in items:
+            if len(c) > CALLOUT_MAX:
+                errs.append(f"[콜아웃 {group}] '{c}' {len(c)}자 — "
+                            f"최대 {CALLOUT_MAX}자")
+    for group, items in (assets.get("snippets") or {}).items():
+        for sn in items:
+            vals = sn.get("values", [])
+            if len(vals) < SNIPPET_MIN_VALUES:
+                errs.append(f"[스니펫 {group}/{sn.get('header')}] 값 {len(vals)}개 "
+                            f"— 최소 {SNIPPET_MIN_VALUES}개 필요")
+            for v in vals:
+                if len(v) > SNIPPET_VALUE_MAX:
+                    errs.append(f"[스니펫 {group}] '{v}' {len(v)}자 — "
+                                f"최대 {SNIPPET_VALUE_MAX}자")
+    return errs
 
 
 def validate(plan: dict, ads: dict) -> list[str]:
@@ -91,7 +135,53 @@ def write_csv(path: str, header: list[str], rows: list[list]) -> None:
     print(f"  {os.path.basename(path):32s} {len(rows):4d}행")
 
 
-def build(plan: dict, ads: dict, cfg: dict, out_dir: str, status: str) -> None:
+def build_assets(assets: dict, plan: dict, cfg: dict, resolve_url,
+                 out_dir: str, status: str) -> None:
+    """사이트링크 / 콜아웃 / 구조화된 스니펫을 캠페인 단위 CSV로 생성."""
+    if not assets:
+        return
+    by_id = {c["id"]: c for c in plan["campaigns"]}
+    groups = assets.get("groups") or {}
+
+    sl_rows, co_rows, sn_rows = [], [], []
+    for group, camp_ids in groups.items():
+        for cid in camp_ids:
+            camp = by_id.get(cid)
+            if not camp:
+                continue
+            name = camp["name"]
+            product = camp["product"]
+            for it in (assets.get("sitelinks") or {}).get(group, []):
+                sl_rows.append([name, "", it["text"], it.get("desc1", ""),
+                                it.get("desc2", ""),
+                                resolve_url(product, it.get("landing")), status])
+            for c in (assets.get("callouts") or {}).get(group, []):
+                co_rows.append([name, c, status])
+            for sn in (assets.get("snippets") or {}).get(group, []):
+                sn_rows.append([name, sn["header"],
+                                ";".join(sn.get("values", [])), status])
+
+    # 브랜드 캠페인처럼 두 그룹에 모두 속하면 중복이 생기므로 제거
+    def dedupe(rows):
+        seen, out = set(), []
+        for r in rows:
+            key = tuple(r)
+            if key not in seen:
+                seen.add(key)
+                out.append(r)
+        return out
+
+    write_csv(os.path.join(out_dir, "06_sitelinks.csv"),
+              ["Campaign", "Ad Group", "Sitelink Text", "Description Line 1",
+               "Description Line 2", "Final URL", "Status"], dedupe(sl_rows))
+    write_csv(os.path.join(out_dir, "07_callouts.csv"),
+              ["Campaign", "Callout Text", "Status"], dedupe(co_rows))
+    write_csv(os.path.join(out_dir, "08_structured_snippets.csv"),
+              ["Campaign", "Header", "Values", "Status"], dedupe(sn_rows))
+
+
+def build(plan: dict, ads: dict, cfg: dict, out_dir: str, status: str,
+          assets: dict | None = None) -> None:
     d = plan["defaults"]
     monthly = cfg["account"]["monthly_budget"]
     def resolve_url(product: str, landing: str | None) -> str:
@@ -182,6 +272,8 @@ def build(plan: dict, ads: dict, cfg: dict, out_dir: str, status: str) -> None:
         for item in fallback:
             print(f"       - {item}")
 
+    build_assets(assets, plan, cfg, resolve_url, out_dir, status)
+
     # 예산 요약
     print("\n[예산 배분]")
     total_daily = 0.0
@@ -200,6 +292,7 @@ def main() -> int:
     ap = argparse.ArgumentParser(description="Google Ads Editor 업로드 CSV 생성")
     ap.add_argument("--plan", default=os.path.join(ROOT, "campaigns", "plan.yaml"))
     ap.add_argument("--ads", default=os.path.join(ROOT, "campaigns", "ads.yaml"))
+    ap.add_argument("--assets", default=os.path.join(ROOT, "campaigns", "assets.yaml"))
     ap.add_argument("--config", default=os.path.join(ROOT, "config", "products.yaml"))
     ap.add_argument("--out", default=os.path.join(ROOT, "campaigns", "editor"))
     ap.add_argument("--status", default="Paused",
@@ -210,8 +303,9 @@ def main() -> int:
     plan = load_yaml(args.plan)
     ads = load_yaml(args.ads)
     cfg = load_yaml(args.config)
+    assets = load_yaml(args.assets) if os.path.isfile(args.assets) else {}
 
-    errs = validate(plan, ads)
+    errs = validate(plan, ads) + validate_assets(assets, plan)
     if errs:
         print("설계안 검사 실패:", file=sys.stderr)
         for e in errs:
@@ -220,13 +314,14 @@ def main() -> int:
     print("설계안 검사 통과 (글자 수 / 참조 무결성)")
 
     try:
-        build(plan, ads, cfg, args.out, args.status)
+        build(plan, ads, cfg, args.out, args.status, assets)
     except PlanError as exc:
         print(f"\n오류: {exc}", file=sys.stderr)
         return 1
 
     print("\n다음 단계: Google Ads Editor > 계정 > 가져오기 > 파일에서 가져오기")
-    print("           01 → 02 → 03 → 04 → 05 순서로 하나씩 가져온 뒤 '변경사항 게시'")
+    print("           01 → 02 → ... → 08 순서로 하나씩 가져온 뒤 '변경사항 게시'")
+    print("           (06~08 애셋은 열 이름이 다르면 가져오기 대화상자에서 직접 매핑)")
     print(f"           업로드 상태: {args.status} "
           f"(검수 후 직접 '사용 설정'으로 바꾸세요)")
     print("\n주의: 'Target impression share'(노출 점유율 타겟) 전략을 쓰는 캠페인은")

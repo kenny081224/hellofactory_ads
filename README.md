@@ -15,8 +15,9 @@ python3 scripts/fetch_ads.py --check
 python3 scripts/fetch_ads.py --all-time
 python3 scripts/analyze.py
 
-# 2) 검색어에서 낭비 걸러내기
+# 2) 검색어에서 낭비 걸러내기 + 애셋 진단
 python3 scripts/search_terms.py
+python3 scripts/assets.py
 
 # 3) 새 캠페인 업로드 파일 만들기
 python3 scripts/make_editor_csv.py
@@ -40,6 +41,7 @@ python3 scripts/analyze.py --dir data/sample --out /tmp
 | 0-1 | Google Ads API 연동 (승인 전엔 브라우저) | [`google_ads_api.md`](docs/google_ads_api.md) · [`browser_download.md`](docs/browser_download.md) |
 | 1 | 지금까지의 실적 분석 | `python3 scripts/fetch_ads.py` → `analyze.py` |
 | 2 | 검색어 정리 (제외 키워드 / 신규 키워드) | `python3 scripts/search_terms.py` |
+| 2-1 | 애셋 진단·보강 | `python3 scripts/assets.py` · [`docs/assets.md`](docs/assets.md) |
 | 3 | 새 캠페인 구조 확인·수정 | [`campaigns/structure.md`](campaigns/structure.md) |
 | 4 | Editor 업로드 파일 생성 | `python3 scripts/make_editor_csv.py` |
 | 5 | 주간·월간 개선 루틴 | [`docs/weekly_optimization.md`](docs/weekly_optimization.md) |
@@ -58,6 +60,7 @@ config/products.yaml       제품 정보, 랜딩 URL, 목표 CPA/ROAS, 예산 �
 config/credentials.env     Google Ads API 인증 정보 (커밋 제외, .example 참고)
 campaigns/plan.yaml        새 캠페인·광고그룹·키워드·제외 키워드 설계 (정답 소스)
 campaigns/ads.yaml         반응형 검색광고 문안 (한국어 글자 수 자동 검사)
+campaigns/assets.yaml      사이트링크·콜아웃·스니펫 등 애셋 문안
 campaigns/structure.md     구조를 왜 이렇게 바꾸는지에 대한 설명
 campaigns/editor/          Google Ads Editor 업로드용 CSV (생성물, 커밋됨)
 campaigns/generated/       검색어 분석이 만든 제외/신규 키워드 CSV (커밋 제외)
@@ -68,10 +71,14 @@ docs/weekly_optimization.md  지속 개선 루틴
 reports/                   분석 결과 (커밋 제외)
 docs/google_ads_api.md     API 연동 설정 절차
 docs/browser_download.md   브라우저 다운로드 자동 정리
+docs/assets.md             애셋 전략·이미지 규격·전달 방법
+assets/current, assets/new 이미지 애셋 (규격 검사: check_images.py)
 docs/tagging_hellobell.md  자사몰 제품별 전환 태그 설치
 scripts/fetch_ads.py       Google Ads API 로 실적 리포트 자동 수집
 scripts/browser_download.py  크롬 다운로드를 감시해 data/raw/ 로 자동 정리
 scripts/import_downloads.py  이미 받아둔 CSV를 판별해 정리
+scripts/assets.py          애셋 실적 진단 (RSA 등급 + 확장 애셋 커버리지)
+scripts/check_images.py    이미지 애셋 규격 검사
 scripts/get_refresh_token.py  OAuth refresh token 발급 도우미
 scripts/                   그 외 분석·생성 스크립트
 ```
