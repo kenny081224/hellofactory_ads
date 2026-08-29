@@ -27,11 +27,37 @@ COLUMN_ALIASES = {
     "ad_group":      ["광고그룹", "광고 그룹", "ad group"],
     "keyword":       ["검색 키워드", "키워드", "keyword", "search keyword"],
     "search_term":   ["검색어", "검색 유형", "search term", "search terms"],
-    "match_type":    ["일치검색유형", "일치 검색 유형", "매치 유형", "match type",
-                      "keyword match type"],
+    "match_type":    ["일치검색유형", "일치 검색 유형", "매치 유형", "검색 유형",
+                      "match type", "keyword match type"],
     "ad_id":         ["광고 id", "ad id"],
     "status":        ["캠페인 상태", "광고그룹 상태", "키워드 상태", "상태", "status"],
     "device":        ["기기", "device"],
+    "day_of_week":   ["요일", "day of week"],
+    "hour":          ["시간대", "hour of day"],
+    "placement":     ["게재위치 url", "게재위치url", "placement", "placement url"],
+    "landing_page":  ["방문 페이지", "방문페이지", "landing page"],
+    "location":      ["일치하는 위치", "matched location"],
+    "negative_keyword": ["제외 키워드", "제외키워드", "negative keyword"],
+    "ad_headline":   ["광고 제목 1", "headline 1"],
+    "asset_group":   ["애셋 그룹", "asset group"],
+    # 아래는 접두사가 겹쳐 오인식되기 쉬운 컬럼들 — 반드시 명시해야 합니다
+    "campaign_type": ["캠페인 유형", "campaign type"],
+    "ad_group_type": ["광고그룹 유형", "ad group type"],
+    "keyword_type":  ["키워드 또는 목록"],
+    "budget":        ["예산", "budget"],
+    "budget_name":   ["예산 이름", "budget name"],
+    "budget_type":   ["예산 유형", "budget type"],
+    "bid_strategy":  ["입찰 전략 유형", "bid strategy type"],
+    "opt_score":     ["최적화 점수", "optimization score"],
+    "status_reason": ["상태 이유", "status reason"],
+    "final_url":     ["최종 url", "final url"],
+    "currency":      ["통화 코드", "currency code"],
+    "avg_cost":      ["평균 비용", "avg. cost"],
+    "level":         ["수준", "level"],
+    "source":        ["출처", "source"],
+    "last_updated":  ["최종 업데이트", "last updated"],
+    "added_excluded":["추가됨/제외됨", "added/excluded"],
+    "orig_conv_value": ["원래 전환 가치", "original conv. value"],
     "date":          ["일", "날짜", "day", "date"],
     "week":          ["주", "week"],
     "month":         ["월", "month"],
@@ -41,11 +67,13 @@ COLUMN_ALIASES = {
     "conversions":   ["전환수", "전환 수", "conversions", "conv."],
     "conv_value":    ["전환 가치", "전환가치", "conv. value", "conversion value",
                       "all conv. value"],
-    "ctr":           ["ctr", "클릭률"],
+    "ctr":           ["ctr", "클릭률", "상호작용 발생률", "상호작용발생률"],
+    "interactions":  ["상호작용 수", "상호작용수", "interactions"],
+    "value_per_cost":["비용당 전환 가치", "conv. value / cost"],
     "avg_cpc":       ["평균 cpc", "avg. cpc", "avg cpc"],
     "conv_rate":     ["전환율", "conv. rate"],
     "cost_per_conv": ["전환당비용", "전환당 비용", "cost / conv.", "cost per conv."],
-    "asset":         ["애셋", "asset", "에셋"],
+    "asset":         ["애셋", "asset", "에셋", "확장 소재", "확장소재"],
     "asset_type":    ["애셋 유형", "애셋유형", "asset type", "에셋 유형"],
     "field_type":    ["필드 유형", "필드유형", "field type"],
     "performance":   ["실적", "애셋 실적", "performance", "performance label",
@@ -59,6 +87,7 @@ COLUMN_ALIASES = {
 # 숫자로 변환할 공통 키
 NUMERIC_KEYS = {
     "impressions", "clicks", "cost", "conversions", "conv_value", "ctr",
+    "interactions", "value_per_cost",
     "avg_cpc", "conv_rate", "cost_per_conv", "impr_share", "lost_is_rank",
     "lost_is_budget", "top_is",
 }
@@ -77,13 +106,17 @@ def _norm_header(text: str) -> str:
     return text
 
 
+# 접두사 일치는 긴 별칭부터 검사해야 "캠페인 유형"이 "캠페인"으로 새지 않습니다.
+_ALIASES_BY_LENGTH = sorted(_ALIAS_LOOKUP.items(), key=lambda kv: -len(kv[0]))
+
+
 def normalize_column(name: str) -> str:
     """리포트 컬럼명을 공통 키로. 매칭 실패 시 정리된 원본을 반환."""
     n = _norm_header(name)
     if n in _ALIAS_LOOKUP:
         return _ALIAS_LOOKUP[n]
     # 부분 일치 (예: "전환수 (모든 전환)" -> conversions)
-    for alias, key in _ALIAS_LOOKUP.items():
+    for alias, key in _ALIASES_BY_LENGTH:
         if n.startswith(alias) and len(alias) >= 3:
             return key
     return n
@@ -162,9 +195,11 @@ def load_report(path: str) -> list[dict]:
     for row in rows[header_idx + 1:]:
         if not any(str(c).strip() for c in row):
             continue
-        first = _norm_header(row[0]) if row else ""
-        # "총계: 계정", "총계: 검색" 같은 요약 행 제외
-        if first.startswith("총계") or first.startswith("total"):
+        # "총계: 계정" / "전체: 캠페인" 같은 요약 행 제외.
+        # 요약 라벨이 첫 칸이 아닌 리포트(기기 등)도 있어 앞쪽 칸을 함께 봅니다.
+        head_cells = [_norm_header(c) for c in row[:6]]
+        if any(c.startswith("총계") or c.startswith("전체:") or c.startswith("전체 :")
+               or c.startswith("total") for c in head_cells):
             continue
         rec = {}
         for key, val in zip(header, row):
@@ -251,22 +286,40 @@ def md_table(headers: list[str], rows: list[list[str]], align_right=None) -> str
 
 # -------------------------------------------------- 리포트 종류 자동 판별
 
-REPORT_KINDS = ("search_term", "keyword", "asset", "ad", "ad_group", "campaign")
+# 실적 집계에 쓰는 리포트
+REPORT_KINDS = ("search_term", "keyword", "asset", "asset_group", "ad",
+                "ad_group", "campaign")
+# 세그먼트/참고 리포트 — 합산하면 중복 집계가 되므로 따로 다룹니다
+SEGMENT_KINDS = ("device", "schedule", "placement", "landing_page",
+                 "location", "negative")
+ALL_KINDS = REPORT_KINDS + SEGMENT_KINDS
 
 # 파일명으로 판별할 때 쓰는 단어 (구체적인 것부터 검사)
 FILENAME_PATTERNS = {
-    "search_term": ["searchterm", "search_term", "search-term", "검색어"],
-    "ad_group":    ["adgroup", "ad_group", "ad-group", "광고그룹"],
-    "campaign":    ["campaign", "캠페인"],
-    "keyword":     ["keyword", "키워드"],
-    "asset":       ["애셋", "asset", "에셋", "확장", "extension"],
-    "ad":          ["광고실적", "rsa", "responsive", "ads_", "_ads"],
+    "negative":     ["제외 키워드", "제외키워드", "negative"],
+    "landing_page": ["방문 페이지", "방문페이지", "landing page"],
+    "location":     ["일치하는 위치", "위치 보고서", "location"],
+    "placement":    ["게재위치", "placement"],
+    "schedule":     ["광고 일정", "일일 및 시간", "ad schedule", "hour"],
+    "device":       ["기기 보고서", "device"],
+    "search_term":  ["searchterm", "search_term", "search-term", "검색어"],
+    "asset_group":  ["애셋 그룹", "애셋그룹", "asset group"],
+    "asset":        ["애셋", "asset", "에셋", "확장 소재", "확장소재", "extension"],
+    "ad_group":     ["adgroup", "ad_group", "ad-group", "광고그룹"],
+    "keyword":      ["keyword", "키워드"],
+    "campaign":     ["campaign", "캠페인"],
+    "ad":           ["광고 보고서", "광고실적", "rsa", "responsive", "ads_", "_ads"],
 }
+
+# 파일명 검사 순서 (구체적인 것부터)
+_FILENAME_ORDER = ["negative", "landing_page", "placement", "location",
+                   "schedule", "device", "search_term", "asset_group", "asset",
+                   "ad_group", "keyword", "campaign", "ad"]
 
 
 def kind_from_filename(fname: str) -> str | None:
     low = os.path.basename(fname).lower()
-    for kind in REPORT_KINDS:
+    for kind in _FILENAME_ORDER:
         if any(p in low for p in FILENAME_PATTERNS[kind]):
             return kind
     return None
@@ -290,13 +343,28 @@ def kind_from_columns(path: str) -> str | None:
         cols = {normalize_column(c) for c in row}
         if not cols & set(NUMERIC_KEYS):
             continue
+        # 세그먼트/참고 리포트를 먼저 걸러냅니다 (합산하면 중복 집계)
+        if "negative_keyword" in cols:
+            return "negative"
+        if "landing_page" in cols:
+            return "landing_page"
+        if "location" in cols:
+            return "location"
+        if "placement" in cols:
+            return "placement"
+        if "day_of_week" in cols or "hour" in cols:
+            return "schedule"
+        if "device" in cols:
+            return "device"
         if "search_term" in cols:
             return "search_term"
         if "keyword" in cols:
             return "keyword"
+        if "asset_group" in cols:
+            return "asset_group"
         if "asset" in cols or "asset_type" in cols:
             return "asset"
-        if "ad_id" in cols:
+        if "ad_headline" in cols or "ad_id" in cols:
             return "ad"
         if "ad_group" in cols:
             return "ad_group"
@@ -313,10 +381,17 @@ def classify_report(path: str) -> str | None:
 
 # 종류별 한국어 파일명 접두사 (fetch_ads.py 가 만드는 이름과 동일)
 KIND_PREFIX = {
-    "asset": "애셋",
     "campaign": "캠페인",
     "ad_group": "광고그룹",
     "keyword": "키워드",
     "search_term": "검색어",
-    "ad": "광고실적",
+    "ad": "광고",
+    "asset": "애셋",
+    "asset_group": "애셋그룹",
+    "device": "기기",
+    "schedule": "광고일정",
+    "placement": "게재위치",
+    "landing_page": "방문페이지",
+    "location": "위치",
+    "negative": "제외키워드",
 }

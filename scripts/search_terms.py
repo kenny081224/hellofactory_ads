@@ -54,7 +54,15 @@ def blocked_by_rule(term: str, rules: list[str]) -> str | None:
     return None
 
 
-def classify(rows: list[dict], plan: dict, cfg: dict) -> dict:
+def classify(rows: list[dict], plan: dict, cfg: dict,
+             min_cost: float = 0.0, min_clicks: float = 0.0) -> dict:
+    """검색어를 규칙위반 / 낭비 / 승자 / 관찰 로 분류.
+
+    min_cost·min_clicks 는 '제외 키워드로 등록할 가치가 있는가'의 하한선입니다.
+    클릭 1회짜리 검색어까지 전부 제외 목록에 넣으면 목록만 수천 개가 되고
+    관리가 불가능해집니다. 그런 잡음은 개별 제외가 아니라
+    campaigns/plan.yaml 의 주제별 제외 규칙으로 막는 편이 낫습니다.
+    """
     tg = cfg["targets"]
     all_rules = list(plan["negatives"]["general"])
     for key in plan["negatives"]:
@@ -62,7 +70,7 @@ def classify(rows: list[dict], plan: dict, cfg: dict) -> dict:
             all_rules += list(plan["negatives"][key])
 
     agg = A.aggregate(rows, "search_term", "campaign")
-    rule_hits, waste, winners, watch = [], [], [], []
+    rule_hits, waste, winners, watch, skipped = [], [], [], [], []
 
     # 목표 CPA: 제품별 목표의 평균 (캠페인-제품 매핑이 없을 수 있으므로)
     cpas = [p["target_cpa"] for p in cfg["products"].values()]
@@ -75,7 +83,10 @@ def classify(rows: list[dict], plan: dict, cfg: dict) -> dict:
         hit = blocked_by_rule(term, all_rules)
         if hit and b["conversions"] == 0:
             b["_rule"] = hit
-            rule_hits.append(b)
+            if b["cost"] >= min_cost and b["clicks"] >= min_clicks:
+                rule_hits.append(b)
+            else:
+                skipped.append(b)
             continue
         if b["conversions"] > 0:
             b["_ok"] = target_cpa == 0 or b["cpa"] <= target_cpa
@@ -85,10 +96,11 @@ def classify(rows: list[dict], plan: dict, cfg: dict) -> dict:
         elif b["clicks"] >= 5:
             watch.append(b)
 
-    for lst in (rule_hits, waste, watch):
+    for lst in (rule_hits, waste, watch, skipped):
         lst.sort(key=lambda b: -b["cost"])
     winners.sort(key=lambda b: -b["conversions"])
-    return {"rule": rule_hits, "waste": waste, "winners": winners, "watch": watch}
+    return {"rule": rule_hits, "waste": waste, "winners": winners,
+            "watch": watch, "skipped": skipped}
 
 
 def table(rows: list[dict], extra: str = "") -> str:
@@ -116,6 +128,10 @@ def main() -> int:
     ap.add_argument("--gen", default=os.path.join(ROOT, "campaigns", "generated"))
     ap.add_argument("--plan", default=os.path.join(ROOT, "campaigns", "plan.yaml"))
     ap.add_argument("--config", default=os.path.join(ROOT, "config", "products.yaml"))
+    ap.add_argument("--min-cost", type=float, default=3000,
+                    help="제외 키워드로 등록할 최소 누적 비용(원). 기본 3000")
+    ap.add_argument("--min-clicks", type=float, default=2,
+                    help="제외 키워드로 등록할 최소 클릭수. 기본 2")
     args = ap.parse_args()
 
     with open(args.plan, encoding="utf-8") as fh:
@@ -131,7 +147,7 @@ def main() -> int:
         return 1
     print(f"검색어 {len(rows)}행 로드")
 
-    g = classify(rows, plan, cfg)
+    g = classify(rows, plan, cfg, args.min_cost, args.min_clicks)
     today = dt.date.today().isoformat()
 
     wasted_cost = sum(b["cost"] for b in g["rule"]) + sum(b["cost"] for b in g["waste"])
@@ -145,6 +161,15 @@ def main() -> int:
     parts.append(table(g["winners"], "목표 대비") if g["winners"] else "_해당 없음_")
     parts += ["", "## 4. 관찰 대상 (클릭 5회 이상, 아직 판단 불가)", ""]
     parts.append(table(g["watch"]) if g["watch"] else "_해당 없음_")
+    if g["skipped"]:
+        skipped_cost = sum(b["cost"] for b in g["skipped"])
+        parts += ["", f"## 5. 임계값 미만이라 목록에서 뺀 검색어 "
+                      f"{len(g['skipped'])}개 ({A.won(skipped_cost)})", "",
+                  f"제외 규칙에는 걸리지만 누적 비용 {A.won(args.min_cost)} 미만 "
+                  f"또는 클릭 {args.min_clicks:.0f}회 미만이라 개별 제외 목록에서 "
+                  f"뺐습니다. 이런 잡음은 하나씩 막는 것보다 "
+                  f"`campaigns/plan.yaml` 의 주제별 제외 규칙으로 막는 편이 "
+                  f"관리하기 좋습니다.", ""]
     parts += ["", "## 적용 방법", "",
               "1. `campaigns/generated/negatives_to_add.csv` 를 Google Ads Editor 로 가져오기",
               "2. `campaigns/generated/keywords_to_add.csv` 의 키워드를 해당 광고그룹에 "

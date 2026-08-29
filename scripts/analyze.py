@@ -32,7 +32,7 @@ def load_all(directory: str) -> dict:
     종류는 파일명으로 먼저 판별하고, 알 수 없으면 컬럼 구성으로 판별합니다.
     (브라우저에서 막 내려받아 이름이 무의미한 파일도 처리하기 위함)
     """
-    found = {k: [] for k in A.REPORT_KINDS}
+    found = {k: [] for k in A.ALL_KINDS}
     if not os.path.isdir(directory):
         return found
     for fname in sorted(os.listdir(directory)):

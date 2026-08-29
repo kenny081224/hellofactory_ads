@@ -39,6 +39,24 @@ negatives:
     - 도매
     - 부품
   bisangbel:
+    # ↓ 2023~2026 실적에서 실제로 돈이 샌 주제들 (검색어 리포트 근거)
+    - 투표          # '투표 프로그램' 계열 351개 검색어 806,032원 / 전환 0
+    - 설문
+    - 서베이
+    - 낙상          # '낙상사고' 78,885원 + '노인 낙상 사고' 87,611원 / 전환 0
+    - 돌봄          # '독거노인 돌봄 서비스' 42,901원 / 전환 0
+    - 지원센터
+    - 도우미
+    - 신청자격
+    - 기초연금
+    - 치매
+    - 복지관
+    - 씨스콜        # 경쟁사 브랜드 — 합계 417,663원 / CPA 83,533원
+    - 시스콜
+    - syscall
+    - 링고벨
+    - 링고
+    - ringo
     - 소리
     - 벨소리
     - 효과음
@@ -63,6 +81,13 @@ negatives:
     - "119"
     - 어플
   helloclick:
+    # ↓ '헬로클릭 구매' 캠페인이 1,522,882원 쓰고 전환 0이 된 원인
+    - 투표          # '투표' 키워드 30개 1,170,086원 / 전환 0
+    - 전자투표
+    - 온라인투표
+    - 설문
+    - 서베이
+    - 어워즈
     - 카훗
     - kahoot
     - 멘티미터
@@ -127,18 +152,34 @@ campaigns:
   - id: bell_general
     name: "[검색] 비상벨 | 일반·시설별"
     product: bisangbel
-    budget_share: 0.25
+    budget_share: 0.30
     priority: 2
     rationale: >
       '비상벨', '무선 비상벨' 같은 광의 키워드와 시설별 수요를 담습니다.
       검색량은 크지만 의도가 섞여 있어 제외 키워드 관리가 성패를 가릅니다.
     ad_groups:
+      - id: ag_wireless_call
+        name: "무선 호출벨 (최고 효율)"
+        note: >
+          실적 근거: '무선 호출벨' 키워드가 CPA 5,031원에 전환 57건으로
+          전체 검색 전환의 절반 이상을 만들었습니다. 광고그룹을 따로 떼어
+          예산과 입찰을 보호합니다.
+        max_cpc: 900
+        keywords:
+          exact: [무선 호출벨, 호출벨, 콜벨, 무선 콜벨]
+          phrase: [무선 호출벨 가격, 호출벨 가격, 업소용 호출벨, 매장 호출벨,
+                   호출벨 설치, 무선 호출 벨, 테이블 호출벨]
+        final_url: bisangbel
+        landing: wireless
+        path1: 무선호출벨
+        path2: 견적
+        rsa: rsa_wireless_call
       - id: ag_wireless
         name: "무선 비상벨"
         keywords:
-          exact: [무선 비상벨, 비상벨, 비상호출벨]
+          exact: [무선 비상벨, 비상벨, 비상호출벨, 음성인식 비상벨]
           phrase: [무선 비상호출벨, 비상벨 가격, 비상벨 설치, 비상벨 추천,
-                   무선 호출벨, 비상벨 세트, 비상벨 구매]
+                   비상벨 세트, 비상벨 구매, 비상벨 시스템]
         final_url: bisangbel
         landing: wireless
         path1: 무선비상벨
@@ -156,10 +197,16 @@ campaigns:
         path2: 비상벨
         rsa: rsa_facility
       - id: ag_home_care
-        name: "가정·케어 호출벨"
+        name: "노인·케어 호출벨"
+        note: >
+          실적 근거: '노인 안심벨' CPA 12,347원, '노인 비상벨' CPA 6,883원(검색어),
+          '독거노인 관리 시스템' CPA 641원으로 전환이 나옵니다. 다만 '독거노인'을
+          확장검색으로 열어두면 복지·돌봄 정보탐색으로 새어 748,128원에 CPA
+          149,626원이 나왔으므로, 반드시 정확·구문일치로만 운영합니다.
         keywords:
-          phrase: [가정용 비상벨, 어르신 호출벨, 환자 호출벨, 침대 호출벨,
-                   독거노인 비상벨, 간병 호출벨, 노인 비상벨, 거동불편 호출벨]
+          exact: [노인 안심벨, 노인 비상벨, 독거노인 비상벨, 독거노인 안심벨]
+          phrase: [독거노인 관리 시스템, 어르신 호출벨, 환자 호출벨, 침대 호출벨,
+                   가정용 비상벨, 간병 호출벨, 거동불편 호출벨, 요양원 호출벨]
         final_url: bisangbel
         landing: home_care
         path1: 가정용
@@ -192,8 +239,9 @@ campaigns:
         name: "브랜드 - 헬로벨/헬로팩토리"
         max_cpc: 500
         keywords:
-          exact: [헬로벨, 헬로팩토리, hellobell, hellofactory]
-          phrase: [헬로벨 비상벨, 헬로벨 호출벨, 헬로팩토리 비상벨, 헬로벨 가격]
+          exact: [헬로벨, 헬로 벨, 헬로팩토리, hellobell, hellofactory]
+          phrase: [헬로벨 비상벨, 헬로벨 호출벨, 헬로팩토리 비상벨, 헬로벨 가격,
+                   헬로벨 자사몰]
         final_url: bisangbel
         path1: 헬로벨
         path2: 공식
@@ -213,7 +261,7 @@ campaigns:
   - id: click_edu
     name: "[검색] 헬로클릭 | 교육"
     product: helloclick
-    budget_share: 0.15
+    budget_share: 0.10
     priority: 4
     rationale: >
       '학생응답시스템' 카테고리는 국내 검색량이 매우 얇습니다. 예산을 크게 넣으면

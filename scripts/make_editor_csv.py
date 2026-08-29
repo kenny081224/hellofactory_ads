@@ -22,19 +22,31 @@ import argparse
 import csv
 import os
 import sys
+import unicodedata
 
 import yaml
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-HEADLINE_MAX = 15      # 전각 언어(한국어) 기준
-DESCRIPTION_MAX = 45
-PATH_MAX = 7
-SITELINK_TEXT_MAX = 12
-SITELINK_DESC_MAX = 17
-CALLOUT_MAX = 12
-SNIPPET_VALUE_MAX = 12
+# Google Ads 글자 수는 '영문 기준' 한도를 쓰고, 한글·한자·가나 같은 전각 문자를
+# 2자로 계산합니다. 공백·영문·숫자는 1자입니다.
+#   예) "원격 수신 가능한 스마트 비상벨" = 한글 13자×2 + 공백 4자×1 = 30  → 딱 한도
+# 단순히 len() 으로 15자를 재면 공백이 든 문구를 억울하게 잘라내게 되므로
+# 아래 width() 로 정확히 계산합니다.
+HEADLINE_MAX = 30
+DESCRIPTION_MAX = 90
+PATH_MAX = 15
+SITELINK_TEXT_MAX = 25
+SITELINK_DESC_MAX = 35
+CALLOUT_MAX = 25
+SNIPPET_VALUE_MAX = 25
 SNIPPET_MIN_VALUES = 4
+
+
+def width(text: str) -> int:
+    """Google Ads 기준 글자 수. 전각 문자는 2, 나머지는 1."""
+    return sum(2 if unicodedata.east_asian_width(ch) in ("W", "F") else 1
+               for ch in text or "")
 RSA_MIN_HEADLINES = 8  # Google 권장: 최소 8개 이상, 가능하면 15개
 
 
@@ -65,13 +77,13 @@ def validate_assets(assets: dict, plan: dict) -> list[str]:
                              ("desc1", SITELINK_DESC_MAX),
                              ("desc2", SITELINK_DESC_MAX)):
                 val = it.get(key, "")
-                if len(val) > lim:
+                if width(val) > lim:
                     errs.append(f"[사이트링크 {group}] {key} '{val}' "
-                                f"{len(val)}자 — 최대 {lim}자")
+                                f"{width(val)}자 — 최대 {lim}자")
     for group, items in (assets.get("callouts") or {}).items():
         for c in items:
-            if len(c) > CALLOUT_MAX:
-                errs.append(f"[콜아웃 {group}] '{c}' {len(c)}자 — "
+            if width(c) > CALLOUT_MAX:
+                errs.append(f"[콜아웃 {group}] '{c}' {width(c)}자 — "
                             f"최대 {CALLOUT_MAX}자")
     for group, items in (assets.get("snippets") or {}).items():
         for sn in items:
@@ -80,8 +92,8 @@ def validate_assets(assets: dict, plan: dict) -> list[str]:
                 errs.append(f"[스니펫 {group}/{sn.get('header')}] 값 {len(vals)}개 "
                             f"— 최소 {SNIPPET_MIN_VALUES}개 필요")
             for v in vals:
-                if len(v) > SNIPPET_VALUE_MAX:
-                    errs.append(f"[스니펫 {group}] '{v}' {len(v)}자 — "
+                if width(v) > SNIPPET_VALUE_MAX:
+                    errs.append(f"[스니펫 {group}] '{v}' {width(v)}자 — "
                                 f"최대 {SNIPPET_VALUE_MAX}자")
     return errs
 
@@ -97,9 +109,9 @@ def validate(plan: dict, ads: dict) -> list[str]:
         for ag in camp["ad_groups"]:
             for field in ("path1", "path2"):
                 val = ag.get(field, "")
-                if len(val) > PATH_MAX:
+                if width(val) > PATH_MAX:
                     errs.append(f"[{camp['id']}/{ag['id']}] {field} '{val}' "
-                                f"{len(val)}자 — 최대 {PATH_MAX}자")
+                                f"{width(val)}자 — 최대 {PATH_MAX}자")
             key = ag.get("rsa")
             if key not in ads:
                 errs.append(f"[{camp['id']}/{ag['id']}] RSA '{key}' 를 "
@@ -115,12 +127,12 @@ def validate(plan: dict, ads: dict) -> list[str]:
             if not 2 <= len(descs) <= 4:
                 errs.append(f"[{key}] 설명 {len(descs)}개 — 2~4개여야 합니다.")
             for h in heads:
-                if len(h) > HEADLINE_MAX:
-                    errs.append(f"[{key}] 헤드라인 '{h}' {len(h)}자 — "
+                if width(h) > HEADLINE_MAX:
+                    errs.append(f"[{key}] 헤드라인 '{h}' {width(h)}자 — "
                                 f"최대 {HEADLINE_MAX}자")
             for d in descs:
-                if len(d) > DESCRIPTION_MAX:
-                    errs.append(f"[{key}] 설명 '{d}' {len(d)}자 — "
+                if width(d) > DESCRIPTION_MAX:
+                    errs.append(f"[{key}] 설명 '{d}' {width(d)}자 — "
                                 f"최대 {DESCRIPTION_MAX}자")
             if len(set(heads)) != len(heads):
                 errs.append(f"[{key}] 중복된 헤드라인이 있습니다.")
