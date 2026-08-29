@@ -1,6 +1,6 @@
-# 실제 계정 데이터는 커밋하지 않습니다
-data/raw/*.csv
-data/raw/*.tsv
+# 실제 계정 데이터는 커밋하지 않습니다 (CSV 외 메모·엑셀도 포함)
+data/raw/*
+!data/raw/README.md
 data/processed/*
 reports/*.md
 campaigns/generated/*.csv
