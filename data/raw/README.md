@@ -1,7 +1,13 @@
 # 여기에 Google Ads 리포트 CSV를 넣으세요
 
 `scripts/analyze.py` 와 `scripts/search_terms.py` 가 이 폴더를 읽습니다.
-**파일명에 아래 단어가 들어가야** 리포트 종류를 자동으로 인식합니다.
+리포트 종류는 **파일명으로 먼저, 안 되면 컬럼 구성을 읽어서** 판별하므로
+`report (3).csv` 같은 이름도 그대로 넣으면 됩니다.
+
+> 파일 정리를 자동으로 하려면 `python3 scripts/browser_download.py` 를 켜 두세요.
+> 크롬에서 받는 즉시 이 폴더로 옮겨줍니다. ([`docs/browser_download.md`](../../docs/browser_download.md))
+
+아래는 파일명으로 인식되는 단어입니다.
 
 | 필요한 리포트 | 파일명 예시 | 인식 키워드 |
 | --- | --- | --- |

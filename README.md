@@ -23,8 +23,9 @@ python3 scripts/make_editor_csv.py
 ```
 
 API 설정은 [`docs/google_ads_api.md`](docs/google_ads_api.md) 에 있습니다.
-개발자 토큰 승인 대기 중이라면 [`data/raw/README.md`](data/raw/README.md) 대로
-CSV를 손으로 내려받아 넣어도 이후 스크립트는 똑같이 동작합니다.
+개발자 토큰 승인 대기 중이라면 브라우저로 내려받으세요 —
+`python3 scripts/browser_download.py` 를 켜 두면 크롬에서 받는 즉시 파일을
+판별해 `data/raw/` 로 정리합니다 ([`docs/browser_download.md`](docs/browser_download.md)).
 데이터가 없어도 예시로 동작을 볼 수 있습니다.
 
 ```bash
@@ -36,7 +37,7 @@ python3 scripts/analyze.py --dir data/sample --out /tmp
 | 순서 | 할 일 | 문서 |
 | --- | --- | --- |
 | 0 | **전환 추적부터 고치기** — hellobell.shop 제품별 태그 | [`docs/tagging_hellobell.md`](docs/tagging_hellobell.md) · [`배경`](docs/measurement.md) |
-| 0-1 | Google Ads API 연동 | [`docs/google_ads_api.md`](docs/google_ads_api.md) |
+| 0-1 | Google Ads API 연동 (승인 전엔 브라우저) | [`google_ads_api.md`](docs/google_ads_api.md) · [`browser_download.md`](docs/browser_download.md) |
 | 1 | 지금까지의 실적 분석 | `python3 scripts/fetch_ads.py` → `analyze.py` |
 | 2 | 검색어 정리 (제외 키워드 / 신규 키워드) | `python3 scripts/search_terms.py` |
 | 3 | 새 캠페인 구조 확인·수정 | [`campaigns/structure.md`](campaigns/structure.md) |
@@ -66,8 +67,11 @@ docs/measurement.md        전환 추적 문제와 해결책
 docs/weekly_optimization.md  지속 개선 루틴
 reports/                   분석 결과 (커밋 제외)
 docs/google_ads_api.md     API 연동 설정 절차
+docs/browser_download.md   브라우저 다운로드 자동 정리
 docs/tagging_hellobell.md  자사몰 제품별 전환 태그 설치
 scripts/fetch_ads.py       Google Ads API 로 실적 리포트 자동 수집
+scripts/browser_download.py  크롬 다운로드를 감시해 data/raw/ 로 자동 정리
+scripts/import_downloads.py  이미 받아둔 CSV를 판별해 정리
 scripts/get_refresh_token.py  OAuth refresh token 발급 도우미
 scripts/                   그 외 분석·생성 스크립트
 ```

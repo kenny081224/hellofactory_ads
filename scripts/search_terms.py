@@ -30,15 +30,16 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def load_search_terms(directory: str) -> list[dict]:
+    """검색어 리포트만 골라서 로드 (파일명 → 컬럼 구성 순으로 판별)."""
     rows = []
     for fname in sorted(os.listdir(directory)) if os.path.isdir(directory) else []:
-        low = fname.lower()
-        if not low.endswith((".csv", ".tsv")):
+        if not fname.lower().endswith((".csv", ".tsv")):
             continue
-        if not any(p in low for p in ("searchterm", "search_term", "검색어")):
+        path = os.path.join(directory, fname)
+        if A.classify_report(path) != "search_term":
             continue
         try:
-            rows.extend(A.load_report(os.path.join(directory, fname)))
+            rows.extend(A.load_report(path))
         except ValueError as exc:
             print(f"  [오류] {exc}")
     return rows

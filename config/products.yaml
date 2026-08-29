@@ -20,16 +20,17 @@ products:
     label: 비상벨 (무선 비상벨 / 장애인화장실 도움벨)
     # 판매 채널 — 전 제품이 자사몰(hellobell.shop)에 등록되어 있어
     # 광고 도착지를 자사몰로 통일합니다. Cafe24 라서 전환 태그 설치가 가능합니다.
-    landing_url: https://hellobell.shop/       # 기본 도착지 (아래 landing_urls 미지정 시 사용)
+    landing_url: "https://hellobell.shop/product/detail.html?product_no=45&cate_no=1&display_group=2"
     landing_urls:
-      # ← 실제 상품/카테고리 URL로 교체하세요. 비워두면 landing_url 이 쓰입니다.
-      # 광고그룹별로 가장 가까운 페이지에 떨어뜨릴수록 전환율이 올라갑니다.
-      disabled_toilet: ""    # 장애인화장실 비상벨 상품/카테고리
-      public_toilet: ""      # 공중화장실·화장실 비상벨
-      wireless: ""           # 무선 비상벨 일반
-      facility: ""           # 시설용(병원/학교/경비실) 
-      home_care: ""          # 가정·케어 호출벨
-      smartphone: ""         # 스마트폰 수신 모델
+      # 현재는 전 광고그룹이 같은 상품 페이지로 갑니다.
+      # 장애인화장실 세트·시설용 세트 등 상품 페이지가 따로 생기면
+      # 해당 항목만 바꾸면 광고그룹별로 다른 페이지로 연결됩니다.
+      disabled_toilet: "https://hellobell.shop/product/detail.html?product_no=45&cate_no=1&display_group=2"
+      public_toilet: "https://hellobell.shop/product/detail.html?product_no=45&cate_no=1&display_group=2"
+      wireless: "https://hellobell.shop/product/detail.html?product_no=45&cate_no=1&display_group=2"
+      facility: "https://hellobell.shop/product/detail.html?product_no=45&cate_no=1&display_group=2"
+      home_care: "https://hellobell.shop/product/detail.html?product_no=45&cate_no=1&display_group=2"
+      smartphone: "https://hellobell.shop/product/detail.html?product_no=45&cate_no=1&display_group=2"
     smartstore_url: ""       # 스마트스토어는 보조 채널. 광고 도착지로는 쓰지 않습니다.
     # 이 제품의 구매/문의를 기록할 전환 액션 이름 (docs/tagging_hellobell.md)
     conversion_actions:
@@ -51,12 +52,13 @@ products:
   helloclick:
     name: 헬로클릭
     label: 헬로클릭 (학생응답시스템 / 수업 참여 도구)
-    landing_url: https://hellobell.shop/       # 헬로클릭도 자사몰에 등록되어 있음
+    landing_url: "https://hellobell.shop/category/%ED%97%AC%EB%A1%9C%ED%81%B4%EB%A6%AD-helloclick/48/"
     landing_urls:
-      srs: ""              # 학생응답시스템 기본 세트 상품 페이지
-      class_tool: ""       # 수업 참여 도구 소개/카테고리
-      quiz: ""             # 퀴즈·골든벨 활용 상품 페이지
-      school_buy: ""       # 학교 도입·렌탈 안내 페이지
+      # 헬로클릭은 카테고리 페이지로 연결. 개별 상품 페이지가 생기면 교체하세요.
+      srs: "https://hellobell.shop/category/%ED%97%AC%EB%A1%9C%ED%81%B4%EB%A6%AD-helloclick/48/"
+      class_tool: "https://hellobell.shop/category/%ED%97%AC%EB%A1%9C%ED%81%B4%EB%A6%AD-helloclick/48/"
+      quiz: "https://hellobell.shop/category/%ED%97%AC%EB%A1%9C%ED%81%B4%EB%A6%AD-helloclick/48/"
+      school_buy: "https://hellobell.shop/category/%ED%97%AC%EB%A1%9C%ED%81%B4%EB%A6%AD-helloclick/48/"
     brand_site: https://helloclick.kr/          # 제품 소개용. 구매 동선은 자사몰로
     smartstore_url: ""
     conversion_actions:

@@ -26,41 +26,30 @@ import adslib as A  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# 파일명 패턴 -> 리포트 종류
-REPORT_PATTERNS = {
-    "campaign":    ["campaign", "캠페인"],
-    "ad_group":    ["adgroup", "ad_group", "광고그룹"],
-    "keyword":     ["keyword", "키워드"],
-    "search_term": ["searchterm", "search_term", "검색어"],
-    "ad":          ["ads", "광고실적", "rsa"],
-}
-
-
 def load_all(directory: str) -> dict:
-    """디렉터리의 CSV들을 리포트 종류별로 분류해 로드."""
-    found = {k: [] for k in REPORT_PATTERNS}
+    """디렉터리의 CSV들을 리포트 종류별로 분류해 로드.
+
+    종류는 파일명으로 먼저 판별하고, 알 수 없으면 컬럼 구성으로 판별합니다.
+    (브라우저에서 막 내려받아 이름이 무의미한 파일도 처리하기 위함)
+    """
+    found = {k: [] for k in A.REPORT_KINDS}
     if not os.path.isdir(directory):
         return found
     for fname in sorted(os.listdir(directory)):
         if not fname.lower().endswith((".csv", ".tsv")):
             continue
-        low = fname.lower()
-        kind = None
-        # search_term / ad_group 을 keyword / ad 보다 먼저 매칭
-        for k in ("search_term", "ad_group", "campaign", "keyword", "ad"):
-            if any(p in low for p in REPORT_PATTERNS[k]):
-                kind = k
-                break
+        path = os.path.join(directory, fname)
+        kind = A.classify_report(path)
         if kind is None:
             print(f"  [건너뜀] {fname} — 리포트 종류를 알 수 없습니다.")
             continue
         try:
-            rows = A.load_report(os.path.join(directory, fname))
+            rows = A.load_report(path)
         except ValueError as exc:
             print(f"  [오류] {exc}")
             continue
         found[kind].extend(rows)
-        print(f"  [읽음] {fname} → {kind} ({len(rows)}행)")
+        print(f"  [읽음] {fname} → {A.KIND_PREFIX[kind]} ({len(rows)}행)")
     return found
 
 

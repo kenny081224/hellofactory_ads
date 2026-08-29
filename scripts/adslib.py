@@ -242,3 +242,72 @@ def md_table(headers: list[str], rows: list[list[str]], align_right=None) -> str
     for r in rows:
         lines.append("| " + " | ".join(str(c) for c in r) + " |")
     return "\n".join(lines)
+
+
+# -------------------------------------------------- 리포트 종류 자동 판별
+
+REPORT_KINDS = ("search_term", "keyword", "ad", "ad_group", "campaign")
+
+# 파일명으로 판별할 때 쓰는 단어 (구체적인 것부터 검사)
+FILENAME_PATTERNS = {
+    "search_term": ["searchterm", "search_term", "search-term", "검색어"],
+    "ad_group":    ["adgroup", "ad_group", "ad-group", "광고그룹"],
+    "campaign":    ["campaign", "캠페인"],
+    "keyword":     ["keyword", "키워드"],
+    "ad":          ["광고실적", "rsa", "responsive", "ads_", "_ads"],
+}
+
+
+def kind_from_filename(fname: str) -> str | None:
+    low = os.path.basename(fname).lower()
+    for kind in REPORT_KINDS:
+        if any(p in low for p in FILENAME_PATTERNS[kind]):
+            return kind
+    return None
+
+
+def kind_from_columns(path: str) -> str | None:
+    """파일 내용(컬럼 구성)으로 리포트 종류를 판별.
+
+    파일명이 'report.csv' 처럼 무의미해도 동작하므로, 브라우저에서 막 내려받은
+    파일을 분류할 때 사용합니다.
+    """
+    try:
+        text = _read_text(path)
+    except OSError:
+        return None
+    delim = _sniff_delimiter(text)
+    rows = list(csv.reader(io.StringIO(text), delimiter=delim))
+    for row in rows[:12]:
+        if not _looks_like_header(row):
+            continue
+        cols = {normalize_column(c) for c in row}
+        if not cols & set(NUMERIC_KEYS):
+            continue
+        if "search_term" in cols:
+            return "search_term"
+        if "keyword" in cols:
+            return "keyword"
+        if "ad_id" in cols:
+            return "ad"
+        if "ad_group" in cols:
+            return "ad_group"
+        if "campaign" in cols:
+            return "campaign"
+        return None
+    return None
+
+
+def classify_report(path: str) -> str | None:
+    """파일명 → 내용 순으로 리포트 종류를 판별."""
+    return kind_from_filename(path) or kind_from_columns(path)
+
+
+# 종류별 한국어 파일명 접두사 (fetch_ads.py 가 만드는 이름과 동일)
+KIND_PREFIX = {
+    "campaign": "캠페인",
+    "ad_group": "광고그룹",
+    "keyword": "키워드",
+    "search_term": "검색어",
+    "ad": "광고실적",
+}
