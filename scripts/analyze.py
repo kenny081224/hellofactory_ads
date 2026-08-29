@@ -53,6 +53,14 @@ def load_all(directory: str) -> dict:
     return found
 
 
+def period_label(rows: list[dict]) -> str | None:
+    """데이터에 실제로 담긴 기간 범위를 'YYYY-MM ~ YYYY-MM' 로."""
+    periods = sorted({p for p in (A.row_period(r) for r in rows) if p})
+    if not periods:
+        return None
+    return periods[0] if len(periods) == 1 else f"{periods[0]} ~ {periods[-1]}"
+
+
 def totals(rows: list[dict]) -> dict:
     t = {"impressions": 0.0, "clicks": 0.0, "cost": 0.0,
          "conversions": 0.0, "conv_value": 0.0}
@@ -223,6 +231,12 @@ def build_report(data: dict, cfg: dict) -> str:
                 "`data/raw/` 에 Google Ads 리포트 CSV를 넣고 다시 실행하세요. "
                 "내보내는 방법은 `data/raw/README.md` 에 있습니다.\n")
 
+    period = period_label(base)
+    parts += [f"분석 기간: **{period}**" if period
+              else "분석 기간: 리포트에 기간 컬럼이 없어 **전체 합산** 기준입니다. "
+                   "기간을 나누려면 '세그먼트 → 시간 → 월' 을 적용해 다시 "
+                   "내려받으세요.", ""]
+
     t = totals(base)
     parts += ["## 1. 계정 전체 요약", "", summary_block(t), ""]
 
@@ -275,6 +289,9 @@ def main() -> int:
     ap.add_argument("--dir", default=os.path.join(ROOT, "data", "raw"))
     ap.add_argument("--out", default=os.path.join(ROOT, "reports"))
     ap.add_argument("--config", default=os.path.join(ROOT, "config", "products.yaml"))
+    ap.add_argument("--since", help="시작 월 YYYY-MM. 리포트에 기간 컬럼이 "
+                                    "있을 때만 적용됩니다")
+    ap.add_argument("--until", help="종료 월 YYYY-MM")
     args = ap.parse_args()
 
     with open(args.config, encoding="utf-8") as fh:
@@ -282,6 +299,22 @@ def main() -> int:
 
     print(f"리포트 디렉터리: {args.dir}")
     data = load_all(args.dir)
+
+    if args.since or args.until:
+        dated = sum(1 for rows in data.values() if A.has_period(rows))
+        if not dated:
+            print("\n[주의] 기간(일/주/월) 컬럼이 있는 리포트가 없어 "
+                  "--since/--until 이 무시됩니다.")
+            print("       Google Ads 에서 '세그먼트 → 시간 → 월' 을 적용해 "
+                  "다시 내려받으세요.")
+        else:
+            before = {k: len(v) for k, v in data.items()}
+            data = {k: A.filter_period(v, args.since, args.until)
+                    for k, v in data.items()}
+            dropped = sum(before[k] - len(v) for k, v in data.items())
+            print(f"\n기간 필터 적용: {args.since or '처음'} ~ "
+                  f"{args.until or '끝'} ({dropped}행 제외)")
+
     report = build_report(data, cfg)
     if "sample" in os.path.abspath(args.dir).lower():
         report = ("> ⚠️ **주의: 이 리포트는 `data/sample/` 의 가짜 예시 데이터로 만들어졌습니다.**\n"
@@ -289,7 +322,12 @@ def main() -> int:
                   + report)
 
     os.makedirs(args.out, exist_ok=True)
-    path = os.path.join(args.out, f"analysis_{dt.date.today().isoformat()}.md")
+    tag = ""
+    if args.since or args.until:
+        tag = f"_{(args.since or 'all').replace('-', '')}-" \
+              f"{(args.until or 'now').replace('-', '')}"
+    path = os.path.join(args.out,
+                        f"analysis_{dt.date.today().isoformat()}{tag}.md")
     with open(path, "w", encoding="utf-8") as fh:
         fh.write(report)
     print(f"\n생성됨: {path}\n")

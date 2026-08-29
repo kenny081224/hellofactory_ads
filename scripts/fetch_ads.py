@@ -162,11 +162,16 @@ REPORTS = [
 ]
 
 
-def build_query(spec: dict, since: str, until: str) -> str:
+def build_query(spec: dict, since: str, until: str,
+                by_month: bool = False) -> str:
+    select = list(spec["select"])
+    if by_month:
+        # 월 세그먼트를 넣으면 한 파일에 월별 추이가 담깁니다 (scripts/trend.py)
+        select.insert(0, "segments.month")
     where = [f"segments.date BETWEEN '{since}' AND '{until}'"]
     if spec["where"]:
         where.append(spec["where"])
-    return (f"SELECT {', '.join(spec['select'])} "
+    return (f"SELECT {', '.join(select)} "
             f"FROM {spec['resource']} "
             f"WHERE {' AND '.join(where)}")
 
@@ -194,6 +199,9 @@ def main() -> int:
     ap.add_argument("--out", default=os.path.join(ROOT, "data", "raw"))
     ap.add_argument("--check", action="store_true",
                     help="인증과 계정 접근만 확인하고 종료")
+    ap.add_argument("--by-month", action="store_true",
+                    help="월 세그먼트를 넣어 월별 추이까지 받습니다 "
+                         "(scripts/trend.py 로 분석)")
     args = ap.parse_args()
 
     try:
@@ -231,25 +239,34 @@ def main() -> int:
     total = 0
 
     for spec in REPORTS:
-        query = build_query(spec, since, until)
+        query = build_query(spec, since, until, args.by_month)
         try:
             rows = client.search(query)
         except (CredentialsError, ApiError) as exc:
             print(f"  [{spec['name']}] 실패: {exc}", file=sys.stderr)
             return 1
 
+        headers = (["월"] + spec["headers"]) if args.by_month else spec["headers"]
         path = os.path.join(args.out, f"{spec['name']}_{tag}.csv")
         with open(path, "w", encoding="utf-8-sig", newline="") as fh:
             w = csv.writer(fh)
-            w.writerow(spec["headers"])
+            w.writerow(headers)
             for row in rows:
-                w.writerow(spec["row"](row))
+                line = spec["row"](row)
+                if args.by_month:
+                    line = [pick(row, "segments.month") or ""] + line
+                w.writerow(line)
         total += len(rows)
         print(f"  {spec['name']:8s} {len(rows):6d}행  →  {os.path.basename(path)}")
 
     print(f"\n총 {total}행 저장. 이어서 실행하세요:")
     print("  python3 scripts/analyze.py")
     print("  python3 scripts/search_terms.py")
+    if args.by_month:
+        print("  python3 scripts/trend.py            # 월별 추이")
+        print("  python3 scripts/analyze.py --since 2024-09   # 기간 한정 분석")
+    else:
+        print("\n월별 추이를 보려면 --by-month 를 붙여 다시 받으세요.")
     return 0
 
 

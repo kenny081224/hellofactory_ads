@@ -284,6 +284,63 @@ def md_table(headers: list[str], rows: list[list[str]], align_right=None) -> str
     return "\n".join(lines)
 
 
+# ------------------------------------------------------------ 기간 파싱
+
+_DATE_RE = re.compile(r"(\d{4})\s*[-./년]\s*(\d{1,2})(?:\s*[-./월]\s*(\d{1,2}))?")
+
+
+def parse_period(value) -> str | None:
+    """리포트의 날짜/월 값을 'YYYY-MM' 로 정규화.
+
+    Google Ads 는 설정에 따라 '2024. 1. 19.', '2024-01-19', '2024년 1월',
+    '2024/01' 등 여러 형태로 내려줍니다.
+    """
+    if value is None:
+        return None
+    text = unicodedata.normalize("NFKC", str(value)).strip()
+    if not text or text in ("--", "-"):
+        return None
+    m = _DATE_RE.search(text)
+    if not m:
+        return None
+    year, month = int(m.group(1)), int(m.group(2))
+    if not 1 <= month <= 12:
+        return None
+    return f"{year:04d}-{month:02d}"
+
+
+def row_period(row: dict) -> str | None:
+    """행에서 기간(YYYY-MM)을 찾습니다. 일 > 주 > 월 순."""
+    for key in ("date", "week", "month"):
+        period = parse_period(row.get(key))
+        if period:
+            return period
+    return None
+
+
+def has_period(rows: list[dict]) -> bool:
+    return any(row_period(r) for r in rows)
+
+
+def filter_period(rows: list[dict], since: str | None,
+                  until: str | None) -> list[dict]:
+    """'YYYY-MM' 기준으로 행을 걸러냅니다. 날짜가 없는 행은 그대로 통과."""
+    if not since and not until:
+        return rows
+    out = []
+    for r in rows:
+        p = row_period(r)
+        if p is None:
+            out.append(r)
+            continue
+        if since and p < since[:7]:
+            continue
+        if until and p > until[:7]:
+            continue
+        out.append(r)
+    return out
+
+
 # -------------------------------------------------- 리포트 종류 자동 판별
 
 # 실적 집계에 쓰는 리포트

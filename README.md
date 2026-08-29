@@ -19,6 +19,10 @@ python3 scripts/analyze.py
 python3 scripts/search_terms.py
 python3 scripts/assets.py
 
+# 2-1) 월별 추이 (리포트에 '세그먼트 → 시간 → 월' 이 적용되어 있어야 함)
+python3 scripts/trend.py
+python3 scripts/analyze.py --since 2024-09      # 기간을 잘라서 재분석
+
 # 3) 새 캠페인 업로드 파일 만들기
 python3 scripts/make_editor_csv.py
 ```
@@ -89,6 +93,7 @@ scripts/fetch_ads.py       Google Ads API 로 실적 리포트 자동 수집
 scripts/browser_download.py  크롬 다운로드를 감시해 data/raw/ 로 자동 정리
 scripts/import_downloads.py  이미 받아둔 CSV를 판별해 정리
 scripts/assets.py          애셋 실적 진단 (RSA 등급 + 확장 애셋 커버리지)
+scripts/trend.py           월별 추이 (초기 vs 최근 비교, 전환 0인 달 탐지)
 scripts/check_images.py    이미지 애셋 규격 검사
 scripts/get_refresh_token.py  OAuth refresh token 발급 도우미
 scripts/                   그 외 분석·생성 스크립트

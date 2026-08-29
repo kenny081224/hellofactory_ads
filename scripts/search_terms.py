@@ -132,6 +132,8 @@ def main() -> int:
                     help="제외 키워드로 등록할 최소 누적 비용(원). 기본 3000")
     ap.add_argument("--min-clicks", type=float, default=2,
                     help="제외 키워드로 등록할 최소 클릭수. 기본 2")
+    ap.add_argument("--since", help="시작 월 YYYY-MM (기간 컬럼이 있을 때만)")
+    ap.add_argument("--until", help="종료 월 YYYY-MM")
     args = ap.parse_args()
 
     with open(args.plan, encoding="utf-8") as fh:
@@ -145,6 +147,15 @@ def main() -> int:
               f"파일명에 '검색어' 또는 'searchterm' 이 들어가야 합니다. "
               f"내보내는 방법은 data/raw/README.md 참고.")
         return 1
+    if args.since or args.until:
+        if not A.has_period(rows):
+            print("[주의] 검색어 리포트에 기간 컬럼이 없어 --since/--until 이 "
+                  "무시됩니다. '세그먼트 → 시간 → 월' 을 적용해 다시 받으세요.")
+        else:
+            n = len(rows)
+            rows = A.filter_period(rows, args.since, args.until)
+            print(f"기간 필터: {args.since or '처음'} ~ {args.until or '끝'} "
+                  f"({n - len(rows)}행 제외)")
     print(f"검색어 {len(rows)}행 로드")
 
     g = classify(rows, plan, cfg, args.min_cost, args.min_clicks)

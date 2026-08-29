@@ -33,8 +33,10 @@ python3 scripts/search_terms.py
 
 ## 매월 (1시간)
 
-- [ ] `python3 scripts/fetch_ads.py --days 30 && python3 scripts/analyze.py` 실행 후
-      **6. 예산 재배분 권고** 를 반영
+- [ ] `python3 scripts/fetch_ads.py --days 30 --by-month && python3 scripts/analyze.py`
+      실행 후 **6. 예산 재배분 권고** 를 반영
+- [ ] `python3 scripts/trend.py` 로 월별 추이 확인 — 비용은 느는데 전환이
+      따라오지 않는 달이 있는지
 - [ ] `config/products.yaml` 의 `target_cpa` / `target_roas` 를 실제 성과 기준으로 갱신
 - [ ] 입찰 전략 승급 판단
       - 캠페인 월 전환 15건 이상 → 전환수 최대화 (타겟 CPA)
