@@ -7,7 +7,12 @@
 ## 빠르게 시작하기
 
 ```bash
-# 1) 지금까지의 실적 분석 — Google Ads 리포트 CSV를 data/raw/ 에 넣고
+# 0) 최초 1회: API 인증 설정 (docs/google_ads_api.md)
+python3 scripts/get_refresh_token.py
+python3 scripts/fetch_ads.py --check
+
+# 1) 실적 데이터 받아서 분석
+python3 scripts/fetch_ads.py --all-time
 python3 scripts/analyze.py
 
 # 2) 검색어에서 낭비 걸러내기
@@ -17,7 +22,9 @@ python3 scripts/search_terms.py
 python3 scripts/make_editor_csv.py
 ```
 
-리포트 CSV를 내려받는 방법은 [`data/raw/README.md`](data/raw/README.md) 에 있습니다.
+API 설정은 [`docs/google_ads_api.md`](docs/google_ads_api.md) 에 있습니다.
+개발자 토큰 승인 대기 중이라면 [`data/raw/README.md`](data/raw/README.md) 대로
+CSV를 손으로 내려받아 넣어도 이후 스크립트는 똑같이 동작합니다.
 데이터가 없어도 예시로 동작을 볼 수 있습니다.
 
 ```bash
@@ -28,22 +35,26 @@ python3 scripts/analyze.py --dir data/sample --out /tmp
 
 | 순서 | 할 일 | 문서 |
 | --- | --- | --- |
-| 0 | **전환 추적부터 고치기** (스마트스토어 구조 문제) | [`docs/measurement.md`](docs/measurement.md) |
-| 1 | 지금까지의 실적 분석 | `python3 scripts/analyze.py` |
+| 0 | **전환 추적부터 고치기** — hellobell.shop 제품별 태그 | [`docs/tagging_hellobell.md`](docs/tagging_hellobell.md) · [`배경`](docs/measurement.md) |
+| 0-1 | Google Ads API 연동 | [`docs/google_ads_api.md`](docs/google_ads_api.md) |
+| 1 | 지금까지의 실적 분석 | `python3 scripts/fetch_ads.py` → `analyze.py` |
 | 2 | 검색어 정리 (제외 키워드 / 신규 키워드) | `python3 scripts/search_terms.py` |
 | 3 | 새 캠페인 구조 확인·수정 | [`campaigns/structure.md`](campaigns/structure.md) |
 | 4 | Editor 업로드 파일 생성 | `python3 scripts/make_editor_csv.py` |
 | 5 | 주간·월간 개선 루틴 | [`docs/weekly_optimization.md`](docs/weekly_optimization.md) |
 
-> **0번을 건너뛰지 마세요.** 광고 도착지가 네이버 스마트스토어이면 Google Ads
-> 전환 태그를 심을 수 없어 실제 구매가 전환으로 기록되지 않습니다. 지금 계정에
-> 보이는 "전환 가치"는 실제 매출이 아닐 가능성이 높고, 그 위에서 스마트 입찰을
-> 돌리면 잘못된 근거로 예산이 배분됩니다.
+> **0번을 건너뛰지 마세요.** 지금처럼 광고 도착지가 네이버 스마트스토어이면
+> Google Ads 전환 태그를 심을 수 없어 실제 구매가 전환으로 기록되지 않습니다.
+> 계정에 보이는 "전환 가치"는 실제 매출이 아닐 가능성이 높고, 그 위에서 스마트
+> 입찰을 돌리면 잘못된 근거로 예산이 배분됩니다.
+> 두 제품 모두 자사몰 hellobell.shop 에 있으므로 도착지를 자사몰로 옮기고
+> `구매_비상벨` / `구매_헬로클릭` 처럼 전환을 제품별로 분리합니다.
 
 ## 폴더 구조
 
 ```
-config/products.yaml       제품 정보, 목표 CPA/ROAS, 예산 — 모든 판단의 기준값
+config/products.yaml       제품 정보, 랜딩 URL, 목표 CPA/ROAS, 예산 — 판단의 기준값
+config/credentials.env     Google Ads API 인증 정보 (커밋 제외, .example 참고)
 campaigns/plan.yaml        새 캠페인·광고그룹·키워드·제외 키워드 설계 (정답 소스)
 campaigns/ads.yaml         반응형 검색광고 문안 (한국어 글자 수 자동 검사)
 campaigns/structure.md     구조를 왜 이렇게 바꾸는지에 대한 설명
@@ -54,7 +65,11 @@ data/sample/               동작 확인용 가짜 예시 데이터
 docs/measurement.md        전환 추적 문제와 해결책
 docs/weekly_optimization.md  지속 개선 루틴
 reports/                   분석 결과 (커밋 제외)
-scripts/                   분석·생성 스크립트 (표준 라이브러리 + PyYAML 만 사용)
+docs/google_ads_api.md     API 연동 설정 절차
+docs/tagging_hellobell.md  자사몰 제품별 전환 태그 설치
+scripts/fetch_ads.py       Google Ads API 로 실적 리포트 자동 수집
+scripts/get_refresh_token.py  OAuth refresh token 발급 도우미
+scripts/                   그 외 분석·생성 스크립트
 ```
 
 ## 설계 요약
@@ -76,7 +91,7 @@ scripts/                   분석·생성 스크립트 (표준 라이브러리 +
 
 ## 요구 사항
 
-Python 3.9+ 와 PyYAML 만 있으면 됩니다.
+Python 3.9+ / PyYAML / requests.
 
 ```bash
 pip install -r requirements.txt

@@ -6,8 +6,7 @@
 ## 매주 (15분) — 월요일
 
 ```bash
-# 1. Google Ads 에서 지난 7일 리포트 4개를 data/raw/ 에 내려받기 (data/raw/README.md 참고)
-# 2. 실행
+python3 scripts/fetch_ads.py --days 7    # API 연동 시. 미연동이면 CSV 수동 다운로드
 python3 scripts/analyze.py
 python3 scripts/search_terms.py
 ```
@@ -31,12 +30,15 @@ python3 scripts/search_terms.py
 
 ## 매월 (1시간)
 
-- [ ] `python3 scripts/analyze.py` 결과의 **6. 예산 재배분 권고** 를 반영
+- [ ] `python3 scripts/fetch_ads.py --days 30 && python3 scripts/analyze.py` 실행 후
+      **6. 예산 재배분 권고** 를 반영
 - [ ] `config/products.yaml` 의 `target_cpa` / `target_roas` 를 실제 성과 기준으로 갱신
 - [ ] 입찰 전략 승급 판단
       - 캠페인 월 전환 15건 이상 → 전환수 최대화 (타겟 CPA)
       - 전환 가치가 정상 수집됨 → 전환가치 최대화 (타겟 ROAS)
 - [ ] 랜딩페이지 전환율 확인. CTR은 좋은데 전환이 없다면 문제는 광고가 아니라 랜딩
+- [ ] 전환 태그가 여전히 살아 있는지 확인 (Cafe24 스킨을 수정하면 스크립트가
+      날아가는 일이 잦습니다 — `docs/tagging_hellobell.md` 5번 검증 목록)
 - [ ] 경쟁 현황: Google Ads → 통계 → 경매 통계 보고서
 
 ## 분기 (반나절)

@@ -94,6 +94,7 @@ campaigns:
                    장애인화장실 비상벨 가격, BF인증 비상벨, 점자 비상벨,
                    장애인 화장실 비상벨 세트]
         final_url: bisangbel
+        landing: disabled_toilet
         path1: 장애인화장실
         path2: 비상벨
         rsa: rsa_disabled_toilet
@@ -104,6 +105,7 @@ campaigns:
           phrase: [여자화장실 비상벨, 화장실 안심 비상벨, 공중화장실 안심벨,
                    화장실 비상벨 설치, 공중화장실 비상벨 가격, 안심비상벨]
         final_url: bisangbel
+        landing: public_toilet
         path1: 공중화장실
         path2: 비상벨
         rsa: rsa_public_toilet
@@ -116,6 +118,7 @@ campaigns:
                    공중화장실 비상벨 의무, 장애인화장실 비상벨 기준,
                    비상벨 설치 법규]
         final_url: bisangbel
+        landing: disabled_toilet
         path1: 설치기준
         path2: 안내
         rsa: rsa_regulation
@@ -137,6 +140,7 @@ campaigns:
           phrase: [무선 비상호출벨, 비상벨 가격, 비상벨 설치, 비상벨 추천,
                    무선 호출벨, 비상벨 세트, 비상벨 구매]
         final_url: bisangbel
+        landing: wireless
         path1: 무선비상벨
         path2: 견적
         rsa: rsa_wireless
@@ -147,6 +151,7 @@ campaigns:
                    어린이집 비상벨, 경비실 비상벨, 사무실 비상벨, 주차장 비상벨,
                    은행 비상벨, 매장 비상벨, 관공서 비상벨, 공장 비상벨]
         final_url: bisangbel
+        landing: facility
         path1: 시설용
         path2: 비상벨
         rsa: rsa_facility
@@ -156,6 +161,7 @@ campaigns:
           phrase: [가정용 비상벨, 어르신 호출벨, 환자 호출벨, 침대 호출벨,
                    독거노인 비상벨, 간병 호출벨, 노인 비상벨, 거동불편 호출벨]
         final_url: bisangbel
+        landing: home_care
         path1: 가정용
         path2: 호출벨
         rsa: rsa_home_care
@@ -165,6 +171,7 @@ campaigns:
           phrase: [스마트폰 비상벨, 원격 비상벨, 장거리 비상벨, 무선 장거리 비상벨,
                    휴대폰 비상벨, 스마트폰 호출벨, 원격 호출벨]
         final_url: bisangbel
+        landing: smartphone
         path1: 스마트폰
         path2: 수신
         rsa: rsa_smartphone
@@ -221,6 +228,7 @@ campaigns:
           phrase: [수업 클리커, 교육용 클리커, 학생용 클리커, 학생 응답기,
                    수업 응답 시스템]
         final_url: helloclick
+        landing: srs
         path1: 학생응답
         path2: 시스템
         rsa: rsa_srs
@@ -230,6 +238,7 @@ campaigns:
           phrase: [수업 참여 도구, 학생 참여 수업, 참여형 수업 도구,
                    수업 참여 유도, 교실 수업 도구, 학생 참여도 확인]
         final_url: helloclick
+        landing: class_tool
         path1: 수업참여
         path2: 도구
         rsa: rsa_class_tool
@@ -239,6 +248,7 @@ campaigns:
           phrase: [퀴즈 버저, 골든벨 버저, 스피드퀴즈 버저, 수업용 버저,
                    교실 퀴즈 장비, 퀴즈 벨, 골든벨 장비]
         final_url: helloclick
+        landing: quiz
         path1: 퀴즈버저
         path2: 수업용
         rsa: rsa_quiz
@@ -248,6 +258,7 @@ campaigns:
           phrase: [학교 수업 기자재, 수업 기자재 렌탈, 교구 렌탈, 학교 교구 구매,
                    수업 보조 기자재, 학교 렌탈 기자재]
         final_url: helloclick
+        landing: school_buy
         path1: 학교도입
         path2: 렌탈
         rsa: rsa_school_buy

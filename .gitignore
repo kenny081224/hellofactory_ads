@@ -17,3 +17,6 @@ __pycache__/
 !reports/.gitkeep
 !data/processed/.gitkeep
 !campaigns/generated/.gitkeep
+
+# 인증 정보 (절대 커밋 금지)
+config/credentials.env

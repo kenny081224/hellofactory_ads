@@ -94,14 +94,21 @@ def write_csv(path: str, header: list[str], rows: list[list]) -> None:
 def build(plan: dict, ads: dict, cfg: dict, out_dir: str, status: str) -> None:
     d = plan["defaults"]
     monthly = cfg["account"]["monthly_budget"]
-    urls = {k: (v.get("landing_url") or v.get("smartstore_url") or "")
-            for k, v in cfg["products"].items()}
+    def resolve_url(product: str, landing: str | None) -> str:
+        """제품 기본 URL, 또는 landing_urls 에 지정된 세부 페이지 URL."""
+        prod = cfg["products"][product]
+        if landing:
+            specific = (prod.get("landing_urls") or {}).get(landing)
+            if specific:
+                return specific
+        return prod.get("landing_url") or ""
 
-    missing = [k for k, v in urls.items() if not v]
+    missing = [k for k, v in cfg["products"].items() if not v.get("landing_url")]
     if missing:
-        raise PlanError(f"config/products.yaml 에 {missing} 의 랜딩 URL이 없습니다.")
+        raise PlanError(f"config/products.yaml 에 {missing} 의 landing_url 이 없습니다.")
 
     camp_rows, ag_rows, kw_rows, neg_rows, ad_rows = [], [], [], [], []
+    fallback: list[str] = []   # 세부 랜딩 URL이 비어 기본 URL로 떨어진 광고그룹
 
     for camp in plan["campaigns"]:
         daily = round(monthly * camp["budget_share"] / 30.4, -2)  # 100원 단위
@@ -131,8 +138,13 @@ def build(plan: dict, ads: dict, cfg: dict, out_dir: str, status: str) -> None:
                                     f"{max_cpc}", status])
 
             rsa = ads[ag["rsa"]]
-            url = urls[camp["product"]] if ag.get("final_url") is None \
-                else urls[ag["final_url"]]
+            product = ag.get("final_url") or camp["product"]
+            landing = ag.get("landing")
+            url = resolve_url(product, landing)
+            if landing and not (cfg["products"][product].get("landing_urls") or {}
+                                ).get(landing):
+                fallback.append(f"{camp['name']} / {ag['name']} "
+                                f"(landing: {landing})")
             row = [camp["name"], ag["name"], "Responsive search ad", status]
             heads = rsa["headlines"]
             row += list(heads) + [""] * (15 - len(heads))
@@ -161,6 +173,14 @@ def build(plan: dict, ads: dict, cfg: dict, out_dir: str, status: str) -> None:
               + ["Headline 1 position"]
               + [f"Description {i}" for i in range(1, 5)]
               + ["Final URL", "Path 1", "Path 2"], ad_rows)
+
+    if fallback:
+        print(f"\n[주의] 아래 {len(fallback)}개 광고그룹은 세부 랜딩 URL이 비어 있어 "
+              f"제품 기본 URL로 설정되었습니다.")
+        print("       config/products.yaml 의 landing_urls 를 채우면 "
+              "광고그룹별 페이지로 연결됩니다.")
+        for item in fallback:
+            print(f"       - {item}")
 
     # 예산 요약
     print("\n[예산 배분]")
