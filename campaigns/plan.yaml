@@ -1,0 +1,257 @@
+# 새 Google Ads 캠페인 설계안 (헬로팩토리)
+#
+# 이 파일이 "정답 소스"입니다. 여기를 고치고
+#   python3 scripts/make_editor_csv.py
+# 를 실행하면 Google Ads Editor 로 그대로 업로드할 CSV가 만들어집니다.
+#
+# 한국어는 Google Ads 에서 '전각 문자'로 취급되어 글자 수 제한이 절반입니다.
+#   헤드라인 15자 / 설명 45자 / 표시 URL 경로 7자
+# scripts/make_editor_csv.py 가 실행 시 자동으로 검사합니다.
+
+defaults:
+  networks: "Google search;Search partners"
+  languages: "ko"
+  locations: "대한민국"
+  ad_rotation: "Optimize"
+  # 초기 2~4주는 학습을 위해 '클릭수 최대화 + 상한 CPC' 로 시작하고,
+  # 전환이 캠페인당 월 15건 이상 쌓이면 '전환수 최대화(타겟 CPA)' 로 전환합니다.
+  start_bid_strategy: "Maximize clicks"
+  start_max_cpc: 700
+
+negatives:
+  # 모든 캠페인에 공통 적용 (제외 키워드 목록으로 만들어 캠페인에 연결)
+  general:
+    - 무료
+    - 중고
+    - 다운로드
+    - 나무위키
+    - 뜻
+    - 의미
+    - 영어로
+    - 채용
+    - 알바
+    - 구인
+    - 연봉
+    - 자격증
+    - 토렌트
+    - 만들기
+    - diy
+    - 도매
+    - 부품
+  bisangbel:
+    - 소리
+    - 벨소리
+    - 효과음
+    - mp3
+    - 화재
+    - 화재경보기
+    - 소방
+    - 감지기
+    - 스프링클러
+    - 소화기
+    - 발신기
+    - 초인종
+    - 도어벨
+    - 도어락
+    - 인터폰
+    - 자전거
+    - 게임
+    - 노래
+    - 수리
+    - 고장
+    - 신고
+    - "119"
+    - 어플
+  helloclick:
+    - 카훗
+    - kahoot
+    - 멘티미터
+    - 패들렛
+    - 헬로마켓
+    - 클릭수
+    - 클릭광고
+    - 마우스
+    - 클릭알바
+    - 앱
+
+campaigns:
+  # =====================================================================
+  - id: bell_legal
+    name: "[검색] 비상벨 | 법정설치"
+    product: bisangbel
+    budget_share: 0.45
+    priority: 1
+    rationale: >
+      법으로 설치가 의무화된 수요(장애인화장실·공중화장실)라 검색 의도가 가장
+      명확하고 구매 결정이 빠릅니다. 전환 단가가 가장 낮게 나올 구간이므로
+      별도 캠페인으로 분리해 예산을 보호합니다.
+    ad_groups:
+      - id: ag_disabled_toilet
+        name: "장애인화장실 비상벨"
+        keywords:
+          exact: [장애인화장실 비상벨, 장애인 화장실 비상벨, 장애인화장실 도움벨, 장애인 도움벨]
+          phrase: [장애인화장실 호출벨, 장애인 호출벨, 장애인화장실 비상벨 설치,
+                   장애인화장실 비상벨 가격, BF인증 비상벨, 점자 비상벨,
+                   장애인 화장실 비상벨 세트]
+        final_url: bisangbel
+        path1: 장애인화장실
+        path2: 비상벨
+        rsa: rsa_disabled_toilet
+      - id: ag_public_toilet
+        name: "공중화장실 비상벨"
+        keywords:
+          exact: [공중화장실 비상벨, 화장실 비상벨, 화장실 안심벨]
+          phrase: [여자화장실 비상벨, 화장실 안심 비상벨, 공중화장실 안심벨,
+                   화장실 비상벨 설치, 공중화장실 비상벨 가격, 안심비상벨]
+        final_url: bisangbel
+        path1: 공중화장실
+        path2: 비상벨
+        rsa: rsa_public_toilet
+      - id: ag_regulation
+        name: "설치 의무·기준 (정보탐색)"
+        note: "구매 직전 단계가 아니라 정보탐색 의도. 입찰을 낮게 잡고 리드 확보용으로만 운영."
+        max_cpc: 400
+        keywords:
+          phrase: [비상벨 설치 의무, 비상벨 설치 기준, 화장실 비상벨 의무화,
+                   공중화장실 비상벨 의무, 장애인화장실 비상벨 기준,
+                   비상벨 설치 법규]
+        final_url: bisangbel
+        path1: 설치기준
+        path2: 안내
+        rsa: rsa_regulation
+
+  # =====================================================================
+  - id: bell_general
+    name: "[검색] 비상벨 | 일반·시설별"
+    product: bisangbel
+    budget_share: 0.25
+    priority: 2
+    rationale: >
+      '비상벨', '무선 비상벨' 같은 광의 키워드와 시설별 수요를 담습니다.
+      검색량은 크지만 의도가 섞여 있어 제외 키워드 관리가 성패를 가릅니다.
+    ad_groups:
+      - id: ag_wireless
+        name: "무선 비상벨"
+        keywords:
+          exact: [무선 비상벨, 비상벨, 비상호출벨]
+          phrase: [무선 비상호출벨, 비상벨 가격, 비상벨 설치, 비상벨 추천,
+                   무선 호출벨, 비상벨 세트, 비상벨 구매]
+        final_url: bisangbel
+        path1: 무선비상벨
+        path2: 견적
+        rsa: rsa_wireless
+      - id: ag_facility
+        name: "시설별 비상벨"
+        keywords:
+          phrase: [병원 비상벨, 요양원 비상벨, 요양병원 호출벨, 학교 비상벨,
+                   어린이집 비상벨, 경비실 비상벨, 사무실 비상벨, 주차장 비상벨,
+                   은행 비상벨, 매장 비상벨, 관공서 비상벨, 공장 비상벨]
+        final_url: bisangbel
+        path1: 시설용
+        path2: 비상벨
+        rsa: rsa_facility
+      - id: ag_home_care
+        name: "가정·케어 호출벨"
+        keywords:
+          phrase: [가정용 비상벨, 어르신 호출벨, 환자 호출벨, 침대 호출벨,
+                   독거노인 비상벨, 간병 호출벨, 노인 비상벨, 거동불편 호출벨]
+        final_url: bisangbel
+        path1: 가정용
+        path2: 호출벨
+        rsa: rsa_home_care
+      - id: ag_smartphone
+        name: "스마트폰 수신 비상벨 (차별점)"
+        keywords:
+          phrase: [스마트폰 비상벨, 원격 비상벨, 장거리 비상벨, 무선 장거리 비상벨,
+                   휴대폰 비상벨, 스마트폰 호출벨, 원격 호출벨]
+        final_url: bisangbel
+        path1: 스마트폰
+        path2: 수신
+        rsa: rsa_smartphone
+
+  # =====================================================================
+  - id: brand
+    name: "[검색] 브랜드 | 헬로벨·헬로클릭"
+    product: bisangbel
+    budget_share: 0.05
+    priority: 3
+    rationale: >
+      브랜드 검색은 CPC 가 싸고 전환율이 가장 높습니다. 경쟁사가 우리 브랜드명에
+      광고를 걸었을 때 상단을 뺏기지 않기 위한 방어용으로 소액만 집행합니다.
+      입찰 전략은 '노출 점유율 타겟 (상단 90%)' 을 권장합니다.
+    bid_strategy: "Target impression share"
+    ad_groups:
+      - id: ag_brand_bell
+        name: "브랜드 - 헬로벨/헬로팩토리"
+        max_cpc: 500
+        keywords:
+          exact: [헬로벨, 헬로팩토리, hellobell, hellofactory]
+          phrase: [헬로벨 비상벨, 헬로벨 호출벨, 헬로팩토리 비상벨, 헬로벨 가격]
+        final_url: bisangbel
+        path1: 헬로벨
+        path2: 공식
+        rsa: rsa_brand_bell
+      - id: ag_brand_click
+        name: "브랜드 - 헬로클릭"
+        max_cpc: 500
+        keywords:
+          exact: [헬로클릭, helloclick]
+          phrase: [헬로팩토리 헬로클릭, 헬로클릭 가격, 헬로클릭 학교]
+        final_url: helloclick
+        path1: 헬로클릭
+        path2: 공식
+        rsa: rsa_brand_click
+
+  # =====================================================================
+  - id: click_edu
+    name: "[검색] 헬로클릭 | 교육"
+    product: helloclick
+    budget_share: 0.15
+    priority: 4
+    rationale: >
+      '학생응답시스템' 카테고리는 국내 검색량이 매우 얇습니다. 예산을 크게 넣으면
+      의도가 다른 검색어로 새기 쉬우므로 소액으로 시작해 검색어 리포트로
+      키워드를 넓혀가는 방식이 맞습니다. 학교 구매는 견적·S2B 경유가 많으므로
+      전환 목표를 '구매'가 아니라 '문의/견적 요청'으로 잡아야 합니다.
+    ad_groups:
+      - id: ag_srs
+        name: "학생응답시스템"
+        keywords:
+          exact: [학생응답시스템, 학생 응답 시스템, 학생반응시스템]
+          phrase: [수업 클리커, 교육용 클리커, 학생용 클리커, 학생 응답기,
+                   수업 응답 시스템]
+        final_url: helloclick
+        path1: 학생응답
+        path2: 시스템
+        rsa: rsa_srs
+      - id: ag_class_tool
+        name: "수업 참여 도구"
+        keywords:
+          phrase: [수업 참여 도구, 학생 참여 수업, 참여형 수업 도구,
+                   수업 참여 유도, 교실 수업 도구, 학생 참여도 확인]
+        final_url: helloclick
+        path1: 수업참여
+        path2: 도구
+        rsa: rsa_class_tool
+      - id: ag_quiz
+        name: "퀴즈·골든벨 버저"
+        keywords:
+          phrase: [퀴즈 버저, 골든벨 버저, 스피드퀴즈 버저, 수업용 버저,
+                   교실 퀴즈 장비, 퀴즈 벨, 골든벨 장비]
+        final_url: helloclick
+        path1: 퀴즈버저
+        path2: 수업용
+        rsa: rsa_quiz
+      - id: ag_school_buy
+        name: "학교 도입·렌탈"
+        keywords:
+          phrase: [학교 수업 기자재, 수업 기자재 렌탈, 교구 렌탈, 학교 교구 구매,
+                   수업 보조 기자재, 학교 렌탈 기자재]
+        final_url: helloclick
+        path1: 학교도입
+        path2: 렌탈
+        rsa: rsa_school_buy
+
+# 예산의 나머지 10% 는 집행하지 않고 예비로 둡니다.
+# 4주 뒤 성과가 확인된 캠페인에 몰아주거나, P-Max 테스트에 사용하세요.
+reserve_share: 0.10

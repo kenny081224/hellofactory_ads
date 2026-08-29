@@ -1,0 +1,19 @@
+# 실제 계정 데이터는 커밋하지 않습니다
+data/raw/*.csv
+data/raw/*.tsv
+data/processed/*
+reports/*.md
+campaigns/generated/*.csv
+
+# 예시 데이터와 안내 문서는 유지
+!data/raw/README.md
+!data/sample/*
+
+__pycache__/
+*.pyc
+.DS_Store
+
+# 빈 폴더 유지
+!reports/.gitkeep
+!data/processed/.gitkeep
+!campaigns/generated/.gitkeep

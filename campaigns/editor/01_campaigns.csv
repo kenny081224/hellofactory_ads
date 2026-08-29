@@ -1,0 +1,5 @@
+﻿Campaign,Campaign Type,Status,Campaign Daily Budget,Budget Type,Networks,Languages,Locations,Bid Strategy Type,Ad Rotation
+[검색] 비상벨 | 법정설치,Search,Paused,22200,Daily,Google search;Search partners,ko,대한민국,Maximize clicks,Optimize
+[검색] 비상벨 | 일반·시설별,Search,Paused,12300,Daily,Google search;Search partners,ko,대한민국,Maximize clicks,Optimize
+[검색] 브랜드 | 헬로벨·헬로클릭,Search,Paused,2500,Daily,Google search;Search partners,ko,대한민국,Target impression share,Optimize
+[검색] 헬로클릭 | 교육,Search,Paused,7400,Daily,Google search;Search partners,ko,대한민국,Maximize clicks,Optimize

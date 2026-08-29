@@ -1,0 +1,83 @@
+# 헬로팩토리 Google Ads 운영 저장소
+
+비상벨 / 헬로클릭 두 제품의 Google Ads 캠페인을 **분석 → 재설계 → 지속 개선**
+하기 위한 작업 저장소입니다. 스프레드시트 대신 이 저장소를 기준으로 운영하면
+"무엇을 왜 바꿨는지"가 커밋 이력으로 남습니다.
+
+## 빠르게 시작하기
+
+```bash
+# 1) 지금까지의 실적 분석 — Google Ads 리포트 CSV를 data/raw/ 에 넣고
+python3 scripts/analyze.py
+
+# 2) 검색어에서 낭비 걸러내기
+python3 scripts/search_terms.py
+
+# 3) 새 캠페인 업로드 파일 만들기
+python3 scripts/make_editor_csv.py
+```
+
+리포트 CSV를 내려받는 방법은 [`data/raw/README.md`](data/raw/README.md) 에 있습니다.
+데이터가 없어도 예시로 동작을 볼 수 있습니다.
+
+```bash
+python3 scripts/analyze.py --dir data/sample --out /tmp
+```
+
+## 진행 순서
+
+| 순서 | 할 일 | 문서 |
+| --- | --- | --- |
+| 0 | **전환 추적부터 고치기** (스마트스토어 구조 문제) | [`docs/measurement.md`](docs/measurement.md) |
+| 1 | 지금까지의 실적 분석 | `python3 scripts/analyze.py` |
+| 2 | 검색어 정리 (제외 키워드 / 신규 키워드) | `python3 scripts/search_terms.py` |
+| 3 | 새 캠페인 구조 확인·수정 | [`campaigns/structure.md`](campaigns/structure.md) |
+| 4 | Editor 업로드 파일 생성 | `python3 scripts/make_editor_csv.py` |
+| 5 | 주간·월간 개선 루틴 | [`docs/weekly_optimization.md`](docs/weekly_optimization.md) |
+
+> **0번을 건너뛰지 마세요.** 광고 도착지가 네이버 스마트스토어이면 Google Ads
+> 전환 태그를 심을 수 없어 실제 구매가 전환으로 기록되지 않습니다. 지금 계정에
+> 보이는 "전환 가치"는 실제 매출이 아닐 가능성이 높고, 그 위에서 스마트 입찰을
+> 돌리면 잘못된 근거로 예산이 배분됩니다.
+
+## 폴더 구조
+
+```
+config/products.yaml       제품 정보, 목표 CPA/ROAS, 예산 — 모든 판단의 기준값
+campaigns/plan.yaml        새 캠페인·광고그룹·키워드·제외 키워드 설계 (정답 소스)
+campaigns/ads.yaml         반응형 검색광고 문안 (한국어 글자 수 자동 검사)
+campaigns/structure.md     구조를 왜 이렇게 바꾸는지에 대한 설명
+campaigns/editor/          Google Ads Editor 업로드용 CSV (생성물, 커밋됨)
+campaigns/generated/       검색어 분석이 만든 제외/신규 키워드 CSV (커밋 제외)
+data/raw/                  Google Ads 리포트 CSV를 넣는 곳 (커밋 제외)
+data/sample/               동작 확인용 가짜 예시 데이터
+docs/measurement.md        전환 추적 문제와 해결책
+docs/weekly_optimization.md  지속 개선 루틴
+reports/                   분석 결과 (커밋 제외)
+scripts/                   분석·생성 스크립트 (표준 라이브러리 + PyYAML 만 사용)
+```
+
+## 설계 요약
+
+**비상벨**과 **헬로클릭**은 구매자가 완전히 다릅니다.
+비상벨은 법정 설치 의무를 진 시설 담당자(관공서·학교·병원)의 B2B/B2G 수요이고,
+헬로클릭은 교사·학교의 교육 기자재 수요입니다. 예산·입찰·문안을 분리합니다.
+
+```
+[검색] 비상벨 | 법정설치       45%   장애인화장실 / 공중화장실 / 설치기준
+[검색] 비상벨 | 일반·시설별     25%   무선비상벨 / 시설별 / 가정케어 / 스마트폰수신
+[검색] 브랜드 | 헬로벨·헬로클릭  5%   브랜드 방어
+[검색] 헬로클릭 | 교육          15%   학생응답시스템 / 수업참여 / 퀴즈버저 / 학교도입
+(예비)                        10%   4주 뒤 성과 좋은 쪽에 투입
+```
+
+예산 비율과 목표는 `config/products.yaml` 과 `campaigns/plan.yaml` 에서 바꾸면
+생성물에 그대로 반영됩니다.
+
+## 요구 사항
+
+Python 3.9+ 와 PyYAML 만 있으면 됩니다.
+
+```bash
+pip install -r requirements.txt
+```

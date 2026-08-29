@@ -1,0 +1,51 @@
+# 헬로팩토리 Google Ads 설정
+# 이 파일의 값이 분석 기준(목표 CPA/ROAS)과 캠페인 생성의 소스입니다.
+
+account:
+  currency: KRW
+  # 계정 전체 월 예산 (원). 아래 제품별 예산 합과 맞추세요.
+  monthly_budget: 1500000
+
+targets:
+  # 진단 리포트에서 "좋다/나쁘다"를 가르는 기준선.
+  # 실제 데이터를 넣은 뒤 첫 분석 결과를 보고 반드시 현실값으로 조정하세요.
+  min_clicks_for_judgement: 30      # 이 미만 클릭은 "데이터 부족"으로 분류
+  min_impressions_for_judgement: 300
+  ctr_floor: 0.03                   # 검색 캠페인 CTR 3% 미만이면 경고
+  wasted_spend_click_threshold: 20  # 전환 0인데 클릭 N회 이상이면 낭비로 표시
+
+products:
+  bisangbel:
+    name: 비상벨
+    label: 비상벨 (무선 비상벨 / 장애인화장실 도움벨)
+    # 판매 채널
+    landing_url: https://hellobell.shop/       # ← 자사몰. 태그 설치 가능 (권장 랜딩)
+    smartstore_url: ""                          # ← 현재 사용 중인 스마트스토어 상품 URL을 넣으세요
+    # 목표
+    goal: leads_and_sales                       # 견적/전화 문의 + 온라인 판매 혼합
+    target_cpa: 25000                           # 목표 전환당 비용 (원)
+    target_roas: 3.0                            # 목표 ROAS (전환가치/비용)
+    monthly_budget: 1050000                     # 월 예산 (원) — 전체의 70%
+    avg_order_value: 90000                      # 평균 주문금액 (원) ← 실제 값으로 교체
+    # 구매자
+    audience: 시설관리자, 건물주, 관공서 담당자, 병원/요양원, 학교 행정실, 매장 점주
+    usp:
+      - 스마트폰으로 어디서나 호출 수신 (거리 제한 없음)
+      - 장애인화장실 법정 설치 기준 대응 (점자 안내판 포함 세트)
+      - 배선 공사 없는 무선 설치
+
+  helloclick:
+    name: 헬로클릭
+    label: 헬로클릭 (학생응답시스템 / 수업 참여 도구)
+    landing_url: https://helloclick.kr/
+    smartstore_url: ""                          # ← 현재 사용 중인 스마트스토어 상품 URL을 넣으세요
+    goal: leads                                 # 학교 구매는 S2B/견적 경유 → 리드가 주 전환
+    target_cpa: 40000
+    target_roas: 2.0
+    monthly_budget: 450000                      # 월 예산 (원) — 전체의 30%
+    avg_order_value: 220000                     # 기본 세트(수신기1+디바이스6) 22만원
+    audience: 초·중·고 교사, 학원 강사, 학교 행정실, 교육청 담당자
+    usp:
+      - 학생 전원의 참여도를 실시간 대시보드로 확인
+      - 과목·단원 선택형 수업 콘텐츠 제공
+      - 학교 렌탈 가능 (예산 부담 없이 도입)
