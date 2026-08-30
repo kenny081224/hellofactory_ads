@@ -55,14 +55,16 @@ python3 scripts/analyze.py --dir data/sample --out /tmp
 
 ## 신규 캠페인 설정안 (제안 단계, 미적용)
 
-- **[`docs/campaign_setup_spec.md`](docs/campaign_setup_spec.md)** — 실행용 설정서 (**v5 최종**)
-  캠페인 4 / 광고그룹 9 / 키워드 51 / 제외 키워드 130 / RSA 9세트(헤드라인 100)
+- **[`docs/campaign_setup_spec.md`](docs/campaign_setup_spec.md)** — **v6 실행 확정본**
+  캠페인 4 / 광고그룹 8 / 키워드 47 / 제외 키워드 134 / RSA 8세트(헤드라인 86)
   승인 상한 20만원 / 활성 18만원 / 예비 2만원
+  - 매장·식당용 스마트 호출벨은 **별도 캠페인으로 분리** (부록 A). 구매자와
+    랜딩이 달라 같은 캠페인에 둘 수 없어, 그 예산을 최고 효율 구간인 Care 로 이관
 - **[`docs/final_review_v4.md`](docs/final_review_v4.md)** — v4 검토 의견과 진행 전 확인 사항
 - **[`docs/plan_comparison.md`](docs/plan_comparison.md)** — 초기 두 분석안 비교
 
-세 차례 교차 검토를 거쳤습니다. v3(검색량 검증) → v4(예산·효율) → v5(최종).
-진행 전 필수 조치 3가지는 `final_review_v4.md` 3장을 보세요.
+교차 검토를 마쳤습니다. v3(검색량 검증) → v4(예산·효율) → v5(반영) → v6(호출벨 분리).
+세팅 전 확인 사항은 `final_review_v4.md` 3장을 보세요.
 `campaigns/spec/*.yaml` 을 고치고 `python3 scripts/gen_setup_spec.py` 로 재생성합니다.
 생성할 때마다 글자 수(전각 2/반각 1), **제품 자료로 확인되지 않은 사양 표현**
 (방수·배터리 2년·A/S·납품 실적·세금계산서), 안전 관련 금지 표현, 제외 키워드와
