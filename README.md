@@ -55,16 +55,17 @@ python3 scripts/analyze.py --dir data/sample --out /tmp
 
 ## 신규 캠페인 설정안 (제안 단계, 미적용)
 
-- **[`docs/campaign_setup_spec.md`](docs/campaign_setup_spec.md)** — 실행용 설정서 (v3, 검색량 검증 반영)
-  캠페인 4 / 광고그룹 8 / 키워드 58 / 제외 키워드 119 / RSA 8세트(헤드라인 88) / 월 20만원
-  - 네이버 데이터랩 + 계정 Google 검색어로 32개 키워드군의 수요를 조사해
-    **광고그룹 5개·키워드 41개를 제거**했습니다 (`campaigns/spec/volume.yaml`)
-  - 브랜드 캠페인 폐지 (자사 브랜드 검색이 기준의 4.5%, 헬로클릭은 0)
-  - 헬로클릭은 검색 수요가 사실상 없어 예산 3%의 최소 탐색만 남김
-- **[`docs/plan_comparison.md`](docs/plan_comparison.md)** — 두 독립 분석안 비교와 병합 판정
+- **[`docs/campaign_setup_spec.md`](docs/campaign_setup_spec.md)** — 실행용 설정서 (**v5 최종**)
+  캠페인 4 / 광고그룹 9 / 키워드 51 / 제외 키워드 130 / RSA 9세트(헤드라인 100)
+  승인 상한 20만원 / 활성 18만원 / 예비 2만원
+- **[`docs/final_review_v4.md`](docs/final_review_v4.md)** — v4 검토 의견과 진행 전 확인 사항
+- **[`docs/plan_comparison.md`](docs/plan_comparison.md)** — 초기 두 분석안 비교
 
+세 차례 교차 검토를 거쳤습니다. v3(검색량 검증) → v4(예산·효율) → v5(최종).
+진행 전 필수 조치 3가지는 `final_review_v4.md` 3장을 보세요.
 `campaigns/spec/*.yaml` 을 고치고 `python3 scripts/gen_setup_spec.py` 로 재생성합니다.
-생성할 때마다 글자 수(전각 2/반각 1), 안전 관련 금지 표현, 제외 키워드와
+생성할 때마다 글자 수(전각 2/반각 1), **제품 자료로 확인되지 않은 사양 표현**
+(방수·배터리 2년·A/S·납품 실적·세금계산서), 안전 관련 금지 표현, 제외 키워드와
 타겟 키워드의 충돌을 자동 검사합니다.
 
 ## 재설계 배경 (제안 단계, 미적용)
