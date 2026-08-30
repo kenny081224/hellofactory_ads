@@ -1,128 +1,110 @@
-# 신규 캠페인 설정 소스 (v2 — 두 분석안 병합)
+# 신규 캠페인 설정 소스 (v3 — 검색량 검증 반영)
+# 네이버 데이터랩 + 계정 Google 검색어 리포트 교차 검증으로
+# 수요가 확인되지 않은 키워드와 광고그룹을 전부 제거했습니다.
 budget:
-  monthly: 300000
+  monthly: 200000
   days: 30.4
 campaigns:
-  - id: BR
-    name: "[검색] 브랜드"
-    product: 공통
-    share: 0.06
-    goal: 브랜드 방어 (구매·문의)
-    conversions: 전부
-    landing: 제품별 해당 페이지
-    groups:
-      - {id: BR1, name: "AG_BR_헬로벨", max_cpc: 500, path: [헬로벨, 공식], rsa: br_bell,
-         exact: [헬로벨, 헬로팩토리, hellobell], phrase: [헬로벨 비상벨, 헬로팩토리 호출벨, 헬로벨 가격]}
-      - {id: BR2, name: "AG_BR_헬로클릭", max_cpc: 700, path: [헬로클릭, 공식], rsa: br_click,
-         exact: [헬로클릭, helloclick], phrase: [헬로클릭 렌탈, 헬로클릭 대여, 헬로클릭 구매]}
-  - id: HBH
-    name: "[검색] 헬로벨 | 개인·가정"
+  - id: HB1
+    name: "[검색] 헬로벨 | 호출벨·비상벨"
     product: 헬로벨
-    share: 0.24
-    goal: 개인 구매
-    conversions: 구매_헬로벨 · 전화적격_헬로벨
-    landing: 헬로벨 개인용 랜딩
+    share: 0.45
+    goal: 구매 + 견적 문의
+    conversions: HB_구매완료 · HB_시설견적_적격 · HB_전화_적격
+    landing: 헬로벨 제품 랜딩 (자사몰)
     groups:
-      - id: HBH1
-        name: "AG_HB_노인가정"
+      - id: HB1A
+        name: "AG_호출벨"
         max_cpc: 1200
-        path: [가정용, 안심벨]
-        rsa: hb_home
-        exact: [노인 안심벨, 노인 비상벨, 독거노인 비상벨, 가정용 비상벨, 어르신 안심벨]
-        phrase: [보호자 호출벨, 어르신 응급벨, 부모님 안심벨, 욕실 비상벨, 침대 호출벨, 독거 어르신 안심벨]
-      - id: HBH2
-        name: "AG_HB_원격스마트"
+        path: [무선, 호출벨]
+        rsa: hb_call
+        note: "수요 1위 (기준 대비 1.47배 · 계정 2년 노출 3,687)"
+        exact: [호출벨, 무선 호출벨, 콜벨]
+        phrase: [호출벨 가격, 무선 호출 벨, 업소용 호출벨, 매장 호출벨, 사무실 호출벨, 호출벨 설치]
+      - id: HB1B
+        name: "AG_비상벨"
         max_cpc: 1200
-        path: [스마트폰, 비상벨]
-        rsa: hb_remote
-        exact: [원격 수신 비상벨, 스마트 비상벨, 스마트폰 비상벨]
-        phrase: [무선 응급 호출벨, 스마트워치 비상벨, 메시지 전달 비상벨, 원격 호출벨]
-  - id: HBF
-    name: "[검색] 헬로벨 | 시설·기관"
+        path: [무선, 비상벨]
+        rsa: hb_bell
+        note: "기준 키워드 · 계정 2년 노출 8,267"
+        exact: [비상벨, 무선 비상벨, 비상 호출벨]
+        phrase: [무선 비상 벨, 비상벨 가격, 비상벨 설치, 비상벨 추천, 비상벨 시스템, 비상벨 세트]
+      - id: HB1C
+        name: "AG_브랜드"
+        max_cpc: 400
+        path: [헬로벨, 공식]
+        rsa: hb_brand
+        note: "자사 브랜드 수요는 기준의 4.5%. 별도 캠페인 없이 광고그룹으로만"
+        exact: [헬로벨, 헬로팩토리, hellobell]
+        phrase: [헬로벨 비상벨, 헬로벨 호출벨]
+  - id: HB2
+    name: "[검색] 헬로벨 | 노인·돌봄"
     product: 헬로벨
-    share: 0.26
+    share: 0.32
+    goal: 구매 + 견적 문의
+    conversions: HB_구매완료 · HB_시설견적_적격 · HB_전화_적격
+    landing: 헬로벨 개인·보호자 랜딩
+    groups:
+      - id: HB2A
+        name: "AG_노인안심벨"
+        max_cpc: 1200
+        path: [노인, 안심벨]
+        rsa: hb_senior
+        note: "최근 2년 최고 효율 (노인 안심벨 CPA 7,042원 · 노인 비상벨 14,848원)"
+        exact: [노인 안심벨, 안심벨, 노인 비상벨, 독거노인 비상벨, 독거노인 안심벨]
+        phrase: [어르신 안심벨, 노인 응급벨, 독거노인 호출벨, 노인 안심 비상벨]
+      - id: HB2B
+        name: "AG_응급안전 (관찰)"
+        max_cpc: 700
+        path: [응급안전, 비상벨]
+        rsa: hb_emergency
+        note: >
+          지자체 사업명이라 검색량은 크지만(기준 0.61배) 신청 정보를 찾는
+          일반인 유입 위험이 큽니다. 정확일치만, 낮은 입찰, 첫 2주 검색어 매일 확인.
+          부적합 유입이 많으면 즉시 중지합니다.
+        exact: [응급안전안심서비스, 독거노인 응급안전]
+        phrase: [응급안전 알림 서비스]
+  - id: HB3
+    name: "[검색] 헬로벨 | 공공·시설"
+    product: 헬로벨
+    share: 0.20
     goal: 시설 견적 문의
-    conversions: 시설견적_헬로벨 · 전화적격_헬로벨
+    conversions: HB_시설견적_적격 · HB_전화_적격
     landing: 헬로벨 시설용 랜딩
     groups:
-      - id: HBF1
-        name: "AG_HB_요양의료"
-        max_cpc: 1600
-        path: [요양시설, 호출벨]
-        rsa: hb_care
-        exact: [요양원 호출벨, 병원 호출벨, 요양병원 호출벨, 요양원 비상벨]
-        phrase: [요양시설 호출벨, 병상 호출벨, 간호사 호출벨, 돌봄 비상벨, 시설 비상벨 시스템, 간병 호출벨]
-      - id: HBF2
-        name: "AG_HB_공공화장실"
-        max_cpc: 1600
+      - id: HB3A
+        name: "AG_화장실"
+        max_cpc: 1500
         path: [화장실, 비상벨]
-        rsa: hb_public
-        exact: [화장실 비상벨, 장애인화장실 비상벨, 공중화장실 비상벨, 장애인 도움벨]
-        phrase: [장애인 화장실 호출벨, 도움 요청 벨, 화장실 안심벨, 공공화장실 호출벨, 학교 비상벨, 관공서 비상벨]
-      - id: HBF3
-        name: "AG_HB_지자체돌봄"
-        max_cpc: 1600
-        path: [응급안전, 비상벨]
-        rsa: hb_gov
-        exact: [독거노인 응급안전, 응급안전안심서비스, 독거노인 안심벨]
-        phrase: [재가 어르신 응급벨, 돌봄 대상자 응급벨, 노인 응급 호출 시스템, 지자체 응급안전 장비]
-  - id: HCR
-    name: "[검색] 헬로클릭 | 행사렌탈"
+        rsa: hb_toilet
+        note: "법정 설치 수요 (기준 0.20 / 0.16배 · 계정 2년 노출 1,336)"
+        exact: [화장실 비상벨, 공중화장실 비상벨, 장애인화장실 비상벨, 장애인 도움벨]
+        phrase: [화장실 안심벨, 여자화장실 비상벨, 장애인 화장실 호출벨, 도움 요청 벨]
+      - id: HB3B
+        name: "AG_의료·기관 (소액)"
+        max_cpc: 1500
+        path: [시설용, 호출벨]
+        rsa: hb_facility
+        note: "수요는 작지만(기준 0.026 / 0.014배) 최근 2년 병원 호출벨 CPA 29,008원으로 전환 확인"
+        exact: [병원 호출벨, 학교 비상벨, 요양원 비상벨]
+        phrase: [간호사 호출벨, 관공서 비상벨]
+  - id: HC1
+    name: "[검색] 헬로클릭 | 탐색 (최소)"
     product: 헬로클릭
-    share: 0.28
-    goal: 렌탈 적격 문의
-    conversions: 렌탈적격문의_헬로클릭 · 전화적격_헬로클릭
-    landing: 헬로클릭 렌탈 견적 랜딩
+    share: 0.03
+    goal: 수요 존재 여부 확인
+    conversions: HC_렌탈문의_적격 · HC_구매문의_적격
+    landing: 헬로클릭 렌탈·구매 문의 랜딩
     groups:
-      - id: HCR1
-        name: "AG_HC_투표기렌탈"
-        max_cpc: 2500
-        path: [투표기, 대여]
-        rsa: hc_rental
-        exact: [무선투표기 대여, 무선투표기 렌탈, 전자투표기 대여, 투표기 렌탈, 청중응답기 대여]
-        phrase: [행사 투표기 대여, 클리커 대여, 투표 장비 대여, 리모컨 투표기 대여, 무선 응답기 렌탈]
-      - id: HCR2
-        name: "AG_HC_행사응답"
-        max_cpc: 2500
-        path: [행사, 청중응답]
-        rsa: hc_event
-        exact: [행사 청중 응답 시스템, 청중응답시스템 대여]
-        phrase: [컨퍼런스 투표 시스템, 세미나 실시간 투표, 청중 평가단 시스템, 현장 만족도 조사 장비,
-                 행사 실시간 설문, 포럼 실시간 투표]
-      - id: HCR3
-        name: "AG_HC_행사퀴즈"
+      - id: HC1A
+        name: "AG_HC_탐색"
         max_cpc: 2000
-        path: [행사, 퀴즈장비]
-        rsa: hc_quiz
-        exact: [골든벨 장비 대여, 행사 퀴즈 시스템]
-        phrase: [기업 퀴즈 이벤트 장비, OX 퀴즈 장비 렌탈, 퀴즈쇼 버저 대여, 골든벨 진행 장비]
-  - id: HCP
-    name: "[검색] 헬로클릭 | 기업구매"
-    product: 헬로클릭
-    share: 0.16
-    goal: 구매 적격 문의
-    conversions: 구매적격문의_헬로클릭 · 데모완료_헬로클릭
-    landing: 헬로클릭 구매·도입 랜딩
-    groups:
-      - id: HCP1
-        name: "AG_HC_시스템구매"
-        max_cpc: 3000
-        path: [청중응답, 구매]
-        rsa: hc_buy
-        exact: [무선투표기 구매, 청중응답시스템 구매, 행사 투표 시스템 구매]
-        phrase: [전자 투표 시스템 도입, 실시간 설문 장비 구매, 청중 응답 시스템 도입]
-      - id: HCP2
-        name: "AG_HC_기업교육"
-        max_cpc: 3000
-        path: [기업교육, 응답시스템]
-        rsa: hc_corp
-        exact: [기업 교육 청중 응답, 사내 교육 투표 시스템]
-        phrase: [직원 교육 퀴즈 시스템, 타운홀 미팅 투표, 워크숍 응답 시스템, 연수원 청중 응답]
-      - id: HCP3
-        name: "AG_HC_총회의결"
-        max_cpc: 3000
-        path: [총회, 투표시스템]
-        rsa: hc_meeting
-        exact: [총회 현장 투표 시스템, 협회 총회 투표기, 임원 선거 투표기]
-        phrase: [안건 의결 시스템, 조합 총회 투표기, 대의원 총회 투표기, 입주자대표회의 투표기]
+        path: [투표기, 대여]
+        rsa: hc_probe
+        note: >
+          검색 수요가 거의 확인되지 않았습니다 (전 키워드 기준 0.005배 이하,
+          계정 2년 노출 합계 55회). 예산을 태우지 않고 '정말 없는지' 확인하는
+          최소 탐색용입니다. 8주 뒤 노출 500회 미만이면 중단하고 비검색 채널로 전환.
+        exact: [헬로클릭, helloclick, 무선투표기, 전자투표기, 청중응답시스템]
+        phrase: [무선투표기 대여, 전자투표기 대여, 청중응답시스템 대여, 투표기 대여, 무선 투표기 렌탈]
 reserve_share: 0.0

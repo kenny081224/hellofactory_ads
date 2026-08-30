@@ -1,0 +1,39 @@
+# 네이버 데이터랩 검색어 트렌드 조사 결과 (2024-09 ~ 2026-08, 월 단위)
+# index = 해당 키워드군 지수 중앙값 / 기준('비상벨'+'무선비상벨') 지수 중앙값
+# 기준 = 1.00. 절대 검색량이 아니라 상대 크기입니다.
+source: 네이버 데이터랩 datalab_search
+period: 2024-09-01 ~ 2026-08-30
+anchor: 비상벨 + 무선비상벨
+groups:
+  - {name: 호출벨 / 무선 호출벨,            index: 1.47, verdict: 채택, note: 조사 대상 중 최대 수요}
+  - {name: 씨스콜 / 링고벨 (경쟁사),         index: 1.27, verdict: 제외, note: 경쟁사 브랜드. 자사 브랜드의 28배}
+  - {name: 비상벨 / 무선비상벨,             index: 1.00, verdict: 채택, note: 기준}
+  - {name: 응급안전안심서비스 / 독거노인 응급안전, index: 0.61, verdict: 조건부, note: 지자체 사업명. 신청 정보 탐색 유입 위험}
+  - {name: 노인 비상벨 / 독거노인 비상벨,      index: 0.34, verdict: 채택, note: 실제 전환도 확인됨}
+  - {name: 노인 안심벨 / 안심벨,            index: 0.23, verdict: 채택, note: 최근 2년 CPA 7042원}
+  - {name: 화장실 비상벨 / 공중화장실 비상벨,   index: 0.20, verdict: 채택, note: 법정 설치 수요}
+  - {name: 퀴즈 버저 / 버저,               index: 0.18, verdict: 채택, note: 헬로클릭에서 유일하게 유의미}
+  - {name: 장애인화장실 비상벨 / 장애인 도움벨,  index: 0.16, verdict: 채택, note: 법정 설치 수요}
+  - {name: 전자투표 / 아파트 전자투표,        index: 0.48, verdict: 조건부, note: 제도·서비스 검색. 장비 수요 아님}
+  - {name: 병원 호출벨 / 간호사 호출벨,       index: 0.026, verdict: 소액채택, note: 최근 2년 CPA 29008원}
+  - {name: 학교 비상벨 / 관공서 비상벨,       index: 0.014, verdict: 소액채택, note: 매우 작지만 존재}
+  - {name: 사원총회 / 대의원 총회,           index: 0.012, verdict: 제외, note: 장비 검색 아님}
+  - {name: 가정용 비상벨,                  index: 0.006, verdict: 제외, note: 사실상 없음}
+  - {name: 헬로벨 (자사 브랜드),             index: 0.045, verdict: 광고그룹으로만, note: 2025-12 이후 0.1~0.8로 급감}
+  - {name: 헬로팩토리 (자사 브랜드),          index: 0.002, verdict: 제외, note: 24개월 중 3개월만 관측}
+  - {name: 무선투표기 / 무선 투표기,          index: 0.003, verdict: 제외, note: 사실상 없음}
+  - {name: 전자투표기 / 투표기 대여,          index: 0.005, verdict: 제외, note: 사실상 없음}
+  - {name: 청중응답시스템,                  index: 0.002, verdict: 제외, note: 24개월 중 5개월만 관측}
+  - {name: 투표기 (단독),                  index: 0.007, verdict: 제외, note: 사실상 없음}
+  - {name: 총회 투표 / 임원선거 투표기,       index: 0.001, verdict: 제외, note: 24개월 중 2개월만 관측}
+  - {name: 헬로클릭 (자사 브랜드),           index: 0.000, verdict: 광고그룹으로만, note: 데이터 없음}
+  - {name: 골든벨 장비 / 골든벨 버저,         index: 0.000, verdict: 제외, note: 데이터 없음}
+  - {name: 행사 투표기 / 투표기 렌탈,         index: 0.000, verdict: 제외, note: 데이터 없음}
+  - {name: 원격 수신 비상벨 / 원격 호출벨,     index: 0.000, verdict: 제외, note: 데이터 없음. 제품 차별점이나 검색어가 아님}
+  - {name: 스마트 비상벨 / 스마트폰 비상벨,    index: 0.002, verdict: 제외, note: 사실상 없음}
+  - {name: 무선 응급 호출벨,                index: 0.000, verdict: 제외, note: 데이터 없음}
+  - {name: 스마트워치 비상벨,               index: 0.000, verdict: 제외, note: 데이터 없음}
+  - {name: 요양원 호출벨 / 요양시설 호출벨,    index: 0.002, verdict: 제외, note: 사실상 없음}
+  - {name: 병상 호출벨 / 간병 호출벨,         index: 0.001, verdict: 제외, note: 사실상 없음}
+  - {name: 어르신 호출벨 / 부모님 안심벨,      index: 0.001, verdict: 제외, note: 사실상 없음}
+  - {name: 실시간 설문 / 현장 설문,          index: 0.001, verdict: 제외, note: 사실상 없음}
