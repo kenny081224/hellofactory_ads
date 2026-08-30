@@ -53,7 +53,17 @@ python3 scripts/analyze.py --dir data/sample --out /tmp
 — 단 '무선 호출벨이 최고 효율'이라는 결론은 1년차 저가치 전환 때문이며
 최근 2년 기준으로는 전환 0입니다. 정정 내용은 최근 2년 문서 4번 참고.
 
-## 재설계안 (제안 단계, 미적용)
+## 신규 캠페인 설정안 (제안 단계, 미적용)
+
+- **[`docs/campaign_setup_spec.md`](docs/campaign_setup_spec.md)** — 실행용 설정서 (v2, 병합안)
+  캠페인 5 / 광고그룹 13 / 키워드 99 / 제외 키워드 115 / RSA 13세트(헤드라인 134) / 월 30만원
+- **[`docs/plan_comparison.md`](docs/plan_comparison.md)** — 두 독립 분석안 비교와 병합 판정
+
+`campaigns/spec/*.yaml` 을 고치고 `python3 scripts/gen_setup_spec.py` 로 재생성합니다.
+생성할 때마다 글자 수(전각 2/반각 1), 안전 관련 금지 표현, 제외 키워드와
+타겟 키워드의 충돌을 자동 검사합니다.
+
+## 재설계 배경 (제안 단계, 미적용)
 
 제품 소개서를 반영한 전면 재설계안: **[`docs/redesign_proposal.md`](docs/redesign_proposal.md)**
 
