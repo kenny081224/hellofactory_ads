@@ -1,0 +1,97 @@
+budget:
+  monthly: 600000
+  days: 30.4
+campaigns:
+  - id: C1
+    name: "[검색] 헬로벨 | 공공·돌봄"
+    product: 헬로벨
+    share: 0.30
+    goal: 견적 문의 (리드)
+    groups:
+      - id: S1
+        name: "S1_지자체돌봄"
+        max_cpc: 1000
+        path: [응급안전, 비상벨]
+        rsa: bell_gov
+        exact: [독거노인 응급안전, 응급안전안심서비스, 독거노인 비상벨, 독거노인 안심벨, 독거노인 응급벨]
+        phrase: [재가 어르신 응급벨, 노인 응급 호출 시스템, 돌봄 대상자 응급벨,
+                 독거노인 관리 시스템, 지자체 응급안전 장비, 응급안전 알림 서비스, 노인 돌봄 응급벨]
+      - id: S2
+        name: "S2_공공시설"
+        max_cpc: 900
+        path: [화장실, 비상벨]
+        rsa: bell_public
+        exact: [장애인화장실 비상벨, 화장실 비상벨, 공중화장실 비상벨, 장애인 도움벨, 장애인화장실 도움벨]
+        phrase: [장애인화장실 호출벨, 화장실 안심벨, 여자화장실 비상벨, 비상벨 설치 기준,
+                 학교 비상벨, 공원 비상벨, 점자 비상벨, 관공서 비상벨]
+  - id: C2
+    name: "[검색] 헬로벨 | 시설·가정"
+    product: 헬로벨
+    share: 0.25
+    goal: 견적 문의 + 구매
+    groups:
+      - id: S3
+        name: "S3_요양의료"
+        max_cpc: 900
+        path: [요양원, 호출벨]
+        rsa: bell_care
+        exact: [요양원 호출벨, 병원 호출벨, 요양병원 호출벨, 환자 호출벨, 요양원 비상벨]
+        phrase: [병상 호출벨, 간병 호출벨, 병실 호출 시스템, 간호사 호출벨, 너싱콜, 요양시설 호출벨]
+      - id: S4
+        name: "S4_가정보호자"
+        max_cpc: 700
+        path: [가정용, 안심벨]
+        rsa: bell_home
+        exact: [노인 안심벨, 노인 비상벨, 가정용 비상벨, 어르신 호출벨, 어르신 안심벨]
+        phrase: [독거 어르신 안심벨, 낙상 감지 호출벨, 어르신 응급벨, 부모님 안심벨,
+                 욕실 비상벨, 침대 호출벨, 가정용 호출벨]
+  - id: C3
+    name: "[검색] 헬로클릭 | 렌탈·총회"
+    product: 헬로클릭
+    share: 0.25
+    goal: 대여 문의 (리드)
+    groups:
+      - id: R1
+        name: "R1_행사렌탈"
+        max_cpc: 900
+        path: [투표기, 대여]
+        rsa: click_rental
+        exact: [무선투표기 대여, 전자투표기 대여, 투표기 렌탈, 무선투표기 렌탈, 청중응답시스템]
+        phrase: [행사 투표기 대여, 무선 응답기 대여, 청중응답시스템 대여, 투표 장비 대여,
+                 리모컨 투표기 대여, 행사 투표 장비, 실시간 설문 장비, 세미나 응답 시스템]
+      - id: R2
+        name: "R2_총회선거"
+        max_cpc: 1000
+        path: [총회, 전자투표]
+        rsa: click_meeting
+        exact: [총회 전자투표, 아파트 전자투표, 임원선거 투표기, 조합 총회 투표]
+        phrase: [입주자대표회의 전자투표, 대의원 총회 투표기, 재건축 조합 총회 투표,
+                 안건 의결 투표기, 찬반 투표기, 동대표 선거 투표기, 총회 투표 장비]
+      - id: R3
+        name: "R3_퀴즈골든벨"
+        max_cpc: 700
+        path: [골든벨, 대여]
+        rsa: click_quiz
+        exact: [골든벨 장비, 퀴즈 버저, 골든벨 버저]
+        phrase: [골든벨 장비 대여, 퀴즈쇼 버저 대여, 스피드퀴즈 버저, 행사 퀴즈 장비, 골든벨 진행 장비]
+  - id: C4
+    name: "[검색] 브랜드"
+    product: 공통
+    share: 0.05
+    goal: 브랜드 방어
+    groups:
+      - id: B1
+        name: "B1_헬로벨브랜드"
+        max_cpc: 500
+        path: [헬로벨, 공식]
+        rsa: brand_bell
+        exact: [헬로벨, 헬로팩토리, hellobell, hellofactory]
+        phrase: [헬로벨 비상벨, 헬로벨 호출벨, 헬로팩토리 비상벨]
+      - id: B2
+        name: "B2_헬로클릭브랜드"
+        max_cpc: 500
+        path: [헬로클릭, 공식]
+        rsa: brand_click
+        exact: [헬로클릭, helloclick, 학생응답시스템]
+        phrase: [헬로클릭 대여, 헬로클릭 가격, 헬로팩토리 헬로클릭]
+reserve_share: 0.15
